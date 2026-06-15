@@ -19,6 +19,23 @@ const FLAGS: Record<string, string> = {
   Canada: "🇨🇦", Iran: "🇮🇷", Colombia: "🇨🇴", "Côte d'Ivoire": "🇨🇮", "Ivory Coast": "🇨🇮", Qatar: "🇶🇦",
 };
 
+const FRUIT_MEDLEYS = [
+  "mango & passionfruit", "strawberry & kiwi", "watermelon & lime",
+  "peach & raspberry", "pineapple & coconut", "cherry & pomegranate",
+  "lychee & dragon fruit", "apricot & blueberry", "fig & blood orange",
+  "papaya & guava", "plum & blackcurrant", "melon & mint",
+];
+const DOG_BREEDS = [
+  "labradoodle", "shih tzu", "border collie", "bichon frise",
+  "dachshund", "golden retriever", "french bulldog", "whippet",
+  "pomeranian", "basset hound", "cocker spaniel", "dalmatian",
+];
+function fixtureHash(home: string, away: string): number {
+  let h = 0;
+  for (const c of home + away) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return h;
+}
+
 // Fixture-display name → sweepstake name (for getOwner lookups)
 const ALIASES: Record<string, string> = {
   "South Korea": "Korea Republic",
@@ -698,9 +715,23 @@ export function TodayTab() {
                       className="mt-3 px-3 py-2"
                       style={{ borderTop: "1px dashed #333", fontFamily: "'VT323', monospace", color: "#aaaaaa", fontSize: "1rem", lineHeight: 1.4 }}
                     >
-                      {homeOwner && awayOwner && homeOwner !== awayOwner ? (
-                        <><span style={{ color: PLAYER_COLORS[homeOwner] }}>{homeOwner}</span>{" "}vs{" "}<span style={{ color: PLAYER_COLORS[awayOwner] }}>{awayOwner}</span>{" "}— sweepstake beef. choose your side.</>
-                      ) : homeOwner && awayOwner && homeOwner === awayOwner ? (
+                      {homeOwner && awayOwner && homeOwner !== awayOwner ? (() => {
+                        const isMedleyVsPooch = new Set([homeOwner, awayOwner]).has("MEDLEY") && new Set([homeOwner, awayOwner]).has("POOCH");
+                        if (isMedleyVsPooch) {
+                          const h = fixtureHash(fixture.home, fixture.away);
+                          const fruit = FRUIT_MEDLEYS[h % FRUIT_MEDLEYS.length];
+                          const breed = DOG_BREEDS[h % DOG_BREEDS.length];
+                          return (
+                            <>
+                              <span style={{ color: PLAYER_COLORS["MEDLEY"] }}>{fruit} medley</span>
+                              {" "}vs{" "}
+                              <span style={{ color: PLAYER_COLORS["POOCH"] }}>{breed}</span>
+                              {" "}— sweepstake beef. choose your side.
+                            </>
+                          );
+                        }
+                        return <><span style={{ color: PLAYER_COLORS[homeOwner] }}>{homeOwner}</span>{" "}vs{" "}<span style={{ color: PLAYER_COLORS[awayOwner] }}>{awayOwner}</span>{" "}— sweepstake beef. choose your side.</>;
+                      })() : homeOwner && awayOwner && homeOwner === awayOwner ? (
                         <>both teams belong to{" "}<span style={{ color: PLAYER_COLORS[homeOwner] }}>{homeOwner}</span>. absolute shambles either way.</>
                       ) : homeOwner ? (
                         <><span style={{ color: PLAYER_COLORS[homeOwner] }}>{homeOwner}</span>{" "}has a dog in this fight.</>
