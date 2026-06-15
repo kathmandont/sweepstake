@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getCountryStats } from "../hooks/useCountryStats";
 import flashImg from "../../imports/1.jpg";
 import chonkieFlashImg from "../../imports/5.jpg";
@@ -97,15 +97,18 @@ export function TeamsTab() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [flash, setFlash] = useState<"hidden" | "visible" | "distorting" | "fading">("hidden");
   const [flashPlayer, setFlashPlayer] = useState<string>("");
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const allTeams = PLAYERS.flatMap(p => p.teams);
   const stats = getCountryStats(allTeams);
 
   function triggerFlash(playerName: string) {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
     setFlashPlayer(playerName);
     setFlash("visible");
-    setTimeout(() => setFlash("distorting"), 900);
-    setTimeout(() => setFlash("fading"), 1700);
-    setTimeout(() => setFlash("hidden"), 2300);
+    timersRef.current.push(setTimeout(() => setFlash("distorting"), 900));
+    timersRef.current.push(setTimeout(() => setFlash("fading"), 1700));
+    timersRef.current.push(setTimeout(() => setFlash("hidden"), 2300));
   }
 
   return (
