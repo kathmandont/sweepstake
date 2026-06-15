@@ -174,6 +174,7 @@ type LiveScore = {
   home: number | null;
   away: number | null;
   status: string;
+  clock: string | null;
   winner: string | null;
   goals: Goal[];
   bookings: Booking[];
@@ -245,6 +246,7 @@ function useLiveScores(selectedDate: string) {
           home: homeScore,
           away: awayScore,
           status: isLive ? "IN_PLAY" : isHalfTime ? "HALF_TIME" : isFinished ? "FINISHED" : statusName,
+          clock: (isLive || isHalfTime) ? (event.status?.displayClock ?? null) : null,
           winner,
           goals: [],
           bookings: [],
@@ -442,6 +444,7 @@ export function TodayTab() {
         score: hasScore ? `${live.home} - ${live.away}` : isLive ? "? - ?" : f.score,
         winner: live.winner === "HOME_TEAM" ? f.home : live.winner === "AWAY_TEAM" ? f.away : live.winner === "DRAW" ? "DRAW" : undefined,
         liveStatus: isLive ? live.status : isFinished ? "FT" : null,
+        liveClock: live.clock ?? null,
         goals,
         bookings,
       };
@@ -639,6 +642,11 @@ export function TodayTab() {
                       }}>
                         {fixture.score ?? fixture.time ?? "VS"}
                       </span>
+                      {(fixture as any).liveStatus && (fixture as any).liveStatus !== "FT" && (fixture as any).liveClock && (
+                        <div style={{ fontSize: "0.65rem", color: "#39ff14", letterSpacing: "0.05em", marginTop: "2px", fontFamily: "'Black Han Sans', sans-serif" }}>
+                          {(fixture as any).liveClock}
+                        </div>
+                      )}
                       {fixture.score && (fixture as any).liveStatus === "FT" && (
                         <div style={{ fontSize: "0.6rem", color: "#555", letterSpacing: "0.08em", marginTop: "2px" }}>
                           FT
