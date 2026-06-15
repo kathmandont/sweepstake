@@ -227,7 +227,7 @@ function useLiveScores(selectedDate: string) {
         const key = `${home}|${away}`;
 
         const statusName: string = event.status?.type?.name ?? "";
-        const isLive = statusName === "STATUS_IN_PROGRESS";
+        const isLive = ["STATUS_IN_PROGRESS", "STATUS_FIRST_HALF", "STATUS_SECOND_HALF"].includes(statusName);
         const isHalfTime = statusName === "STATUS_HALFTIME";
         const isFinished = statusName === "STATUS_FULL_TIME";
 
