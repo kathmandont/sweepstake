@@ -22,21 +22,28 @@ export type PrizeDetection = {
   yellowCardTotals: Record<string, number>; // sweepstake player → total yellows
 };
 
-const CACHE_PREFIX = "wc2026_match_v1_";
+const CACHE_PREFIX = "wc2026_match_v2_";
+const TODAY = new Date().toISOString().split("T")[0];
 
-function getCached(id: number): MatchSummary | null {
+function getCached(id: number, matchDate: string): MatchSummary | null {
   try {
     const raw = localStorage.getItem(`${CACHE_PREFIX}${id}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Don't use cache for matches played today — scores may still be updating
+    if (matchDate >= TODAY) return null;
+    return parsed;
   } catch { return null; }
 }
 
-function setCache(id: number, data: MatchSummary) {
+function setCache(id: number, matchDate: string, data: MatchSummary) {
+  // Only persist cache for matches before today
+  if (matchDate >= TODAY) return;
   try { localStorage.setItem(`${CACHE_PREFIX}${id}`, JSON.stringify(data)); } catch {}
 }
 
 async function fetchDetail(id: number, date: string, homeTeam: string, awayTeam: string): Promise<MatchSummary | null> {
-  const cached = getCached(id);
+  const cached = getCached(id, date);
   if (cached) return cached;
 
   try {
@@ -74,7 +81,7 @@ async function fetchDetail(id: number, date: string, homeTeam: string, awayTeam:
       bookings,
     };
 
-    setCache(id, summary);
+    setCache(id, date, summary);
     return summary;
   } catch { return null; }
 }
@@ -110,7 +117,7 @@ export function useTournamentEvents() {
           const home = normaliseTeam(m.homeTeam?.name ?? "");
           const away = normaliseTeam(m.awayTeam?.name ?? "");
           const date = m.utcDate?.split("T")[0] ?? "";
-          const cached = getCached(m.id);
+          const cached = getCached(m.id, date);
           if (cached) {
             summaries.push(cached);
           } else {
