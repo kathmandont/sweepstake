@@ -22,24 +22,40 @@ export type PrizeDetection = {
   yellowCardTotals: Record<string, number>; // sweepstake player → total yellows
 };
 
-const CACHE_PREFIX = "wc2026_match_v2_";
+const CACHE_PREFIX = "wc2026_match_v3_";
+const LIST_CACHE_KEY = "wc2026_list_v3";
 const TODAY = new Date().toISOString().split("T")[0];
+const PAST_MATCH_TTL = Infinity;     // finished matches from previous days never expire
+const TODAY_MATCH_TTL = 15 * 60 * 1000;  // today's match details: 15 min
+const LIST_TTL = 30 * 60 * 1000;         // finished matches list: 30 min
 
 function getCached(id: number, matchDate: string): MatchSummary | null {
   try {
     const raw = localStorage.getItem(`${CACHE_PREFIX}${id}`);
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Don't use cache for matches played today — scores may still be updating
-    if (matchDate >= TODAY) return null;
-    return parsed;
+    const { data, ts } = JSON.parse(raw);
+    const ttl = matchDate < TODAY ? PAST_MATCH_TTL : TODAY_MATCH_TTL;
+    if (Date.now() - ts > ttl) return null;
+    return data;
   } catch { return null; }
 }
 
-function setCache(id: number, matchDate: string, data: MatchSummary) {
-  // Only persist cache for matches before today
-  if (matchDate >= TODAY) return;
-  try { localStorage.setItem(`${CACHE_PREFIX}${id}`, JSON.stringify(data)); } catch {}
+function setCache(id: number, data: MatchSummary) {
+  try { localStorage.setItem(`${CACHE_PREFIX}${id}`, JSON.stringify({ data, ts: Date.now() })); } catch {}
+}
+
+function getCachedList(): any[] | null {
+  try {
+    const raw = localStorage.getItem(LIST_CACHE_KEY);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > LIST_TTL) return null;
+    return data;
+  } catch { return null; }
+}
+
+function setCachedList(data: any[]) {
+  try { localStorage.setItem(LIST_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch {}
 }
 
 async function fetchDetail(id: number, date: string, homeTeam: string, awayTeam: string): Promise<MatchSummary | null> {
@@ -81,7 +97,7 @@ async function fetchDetail(id: number, date: string, homeTeam: string, awayTeam:
       bookings,
     };
 
-    setCache(id, date, summary);
+    setCache(id, summary);
     return summary;
   } catch { return null; }
 }
@@ -103,13 +119,18 @@ export function useTournamentEvents() {
 
     async function load() {
       try {
-        const res = await fetch(
-          "https://api.football-data.org/v4/competitions/2000/matches?status=FINISHED",
-          { headers: API_HEADERS }
-        );
-        if (!res.ok || cancelled) return;
-        const data = await res.json();
-        const finishedMatches: any[] = data.matches ?? [];
+        let finishedMatches: any[] = getCachedList() ?? [];
+        if (!finishedMatches.length) {
+          const res = await fetch(
+            "https://api.football-data.org/v4/competitions/2000/matches?status=FINISHED",
+            { headers: API_HEADERS }
+          );
+          if (!res.ok || cancelled) return;
+          const data = await res.json();
+          finishedMatches = data.matches ?? [];
+          setCachedList(finishedMatches);
+        }
+        if (cancelled) return;
 
         const summaries: MatchSummary[] = [];
         for (const m of finishedMatches) {
