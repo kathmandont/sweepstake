@@ -167,18 +167,9 @@ const FIXTURES: { date: string; home: string; away: string; time: string; timeAE
   { date: "2026-07-19", home: "TBD", away: "TBD", time: "8:00pm", timeAEST: "5:00am (+1)", stage: "FINAL 🏆", tv: "TBC" },
 ];
 
-const API_KEY = "56d2e374d3f9729a439f6fe67cfc511c";
-const HEADERS = { "x-apisports-key": API_KEY };
-const API_BASE = "https://v3.football.api-sports.io";
 
 type Goal = { minute: number; type: "REGULAR" | "OWN_GOAL" | "PENALTY"; scorer: string; team: string };
 type Booking = { minute: number; type: "YELLOW_CARD" | "RED_CARD" | "YELLOW_RED_CARD"; player: string; team: string };
-type MatchStats = {
-  homePossession: string | null;
-  awayPossession: string | null;
-  homeShotsOnTarget: number | null;
-  awayShotsOnTarget: number | null;
-};
 type LiveScore = {
   home: number | null;
   away: number | null;
@@ -186,41 +177,25 @@ type LiveScore = {
   winner: string | null;
   goals: Goal[];
   bookings: Booking[];
-  fixtureId: number | null;
-  stats: MatchStats | null;
 };
 type LiveScores = Record<string, LiveScore>;
 
-function normaliseTeamName(name: string): string {
-  const map: Record<string, string> = {
-    // Bosnia variants
-    "Bosnia & Herzegovina": "Bosnia-Herzegovina",
-    "Bosnia and Herzegovina": "Bosnia-Herzegovina",
-    "Bosnia-Herzegovina": "Bosnia-Herzegovina",
-    "Bosnia": "Bosnia-Herzegovina",
-    // Korea
-    "Korea Republic": "South Korea",
-    "Republic of Korea": "South Korea",
-    "Korea": "South Korea",
-    // Ivory Coast
-    "Côte d'Ivoire": "Ivory Coast",
-    "Cote d'Ivoire": "Ivory Coast",
-    // Congo
-    "DR Congo": "DR Congo",
-    "Congo DR": "DR Congo",
-    "Democratic Republic of Congo": "DR Congo",
-    "Congo": "DR Congo",
-    // Cape Verde
-    "Cape Verde Islands": "Cape Verde",
-    "Cabo Verde": "Cape Verde",
-    // Other
-    "Curaçao": "Curacao",
-    "United States": "USA",
-    "USA": "USA",
-  };
-  return map[name] ?? name;
-}
+// ESPN uses different team names than the fixture list
+const ESPN_TO_FIXTURE: Record<string, string> = {
+  "Türkiye": "Turkey",
+  "Czechia": "Czech Republic",
+  "Ivory Coast": "Ivory Coast",
+  "DR Congo": "DR Congo",
+  "Cape Verde": "Cape Verde",
+  "Bosnia-Herzegovina": "Bosnia-Herzegovina",
+  "Curacao": "Curacao",
+  "United States": "USA",
+  "South Korea": "South Korea",
+};
 
+function normaliseTeamName(name: string): string {
+  return ESPN_TO_FIXTURE[name] ?? name;
+}
 
 function useLiveScores(selectedDate: string) {
   const [scores, setScores] = useState<LiveScores>({});
@@ -231,68 +206,48 @@ function useLiveScores(selectedDate: string) {
   const fetch_ = useCallback(async (date: string) => {
     setFetching(true);
     try {
-      const [dayRes, liveRes] = await Promise.all([
-        fetch(`${API_BASE}/fixtures?date=${date}&league=1&season=2026`, { headers: HEADERS }),
-        fetch(`${API_BASE}/fixtures?live=all&league=1`, { headers: HEADERS }),
-      ]);
-
-      if (!dayRes.ok) {
-        const errText = await dayRes.text();
-        setApiError(`API ${dayRes.status}: ${errText.slice(0, 120)}`);
+      const res = await fetch(
+        `https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=20&dates=${date.replace(/-/g, "")}`
+      );
+      if (!res.ok) {
+        setApiError(`ESPN ${res.status}`);
         return;
       }
       setApiError(null);
 
-      const dayData = await dayRes.json();
-      const liveData = liveRes.ok ? await liveRes.json() : { response: [] };
-
-      const seen = new Set<number>();
-      const allFixtures = [...(dayData.response ?? []), ...(liveData.response ?? [])].filter(f => {
-        if (seen.has(f.fixture.id)) return false;
-        seen.add(f.fixture.id);
-        return true;
-      });
-
-      const LIVE_STATUSES = ["1H", "2H", "HT", "ET", "BT", "P", "LIVE"];
+      const data = await res.json();
       const updated: LiveScores = {};
 
-      for (const f of allFixtures) {
-        const home = normaliseTeamName(f.teams?.home?.name ?? "");
-        const away = normaliseTeamName(f.teams?.away?.name ?? "");
+      for (const event of data.events ?? []) {
+        const comp = event.competitions?.[0];
+        const homeComp = comp?.competitors?.find((c: any) => c.homeAway === "home");
+        const awayComp = comp?.competitors?.find((c: any) => c.homeAway === "away");
+        const home = normaliseTeamName(homeComp?.team?.displayName ?? "");
+        const away = normaliseTeamName(awayComp?.team?.displayName ?? "");
         const key = `${home}|${away}`;
-        const statusShort = f.fixture?.status?.short ?? "";
-        const isLive = LIVE_STATUSES.includes(statusShort);
-        const isFinished = ["FT", "AET", "PEN"].includes(statusShort);
-        const fixtureId = f.fixture?.id ?? null;
 
-        let stats: MatchStats | null = null;
-        if ((isLive || isFinished) && fixtureId) {
-          try {
-            const statsRes = await fetch(`${API_BASE}/fixtures/statistics?fixture=${fixtureId}`, { headers: HEADERS });
-            if (statsRes.ok) {
-              const statsData = await statsRes.json();
-              const teams = statsData.response ?? [];
-              const getStat = (teamIdx: number, type: string) =>
-                teams[teamIdx]?.statistics?.find((s: any) => s.type === type)?.value ?? null;
-              stats = {
-                homePossession: getStat(0, "Ball Possession"),
-                awayPossession: getStat(1, "Ball Possession"),
-                homeShotsOnTarget: getStat(0, "Shots on Goal"),
-                awayShotsOnTarget: getStat(1, "Shots on Goal"),
-              };
-            }
-          } catch { /* ignore */ }
+        const statusName: string = event.status?.type?.name ?? "";
+        const isLive = statusName === "STATUS_IN_PROGRESS";
+        const isHalfTime = statusName === "STATUS_HALFTIME";
+        const isFinished = statusName === "STATUS_FULL_TIME";
+
+        const homeScore = homeComp?.score != null ? parseInt(homeComp.score, 10) : null;
+        const awayScore = awayComp?.score != null ? parseInt(awayComp.score, 10) : null;
+
+        let winner: string | null = null;
+        if (isFinished && homeScore !== null && awayScore !== null) {
+          if (homeScore > awayScore) winner = "HOME_TEAM";
+          else if (awayScore > homeScore) winner = "AWAY_TEAM";
+          else winner = "DRAW";
         }
 
         updated[key] = {
-          home: f.goals?.home ?? null,
-          away: f.goals?.away ?? null,
-          status: isLive ? "IN_PLAY" : isFinished ? "FINISHED" : statusShort === "HT" ? "HALF_TIME" : statusShort,
-          winner: f.teams?.home?.winner === true ? "HOME_TEAM" : f.teams?.away?.winner === true ? "AWAY_TEAM" : isFinished && f.goals?.home === f.goals?.away ? "DRAW" : null,
+          home: homeScore,
+          away: awayScore,
+          status: isLive ? "IN_PLAY" : isHalfTime ? "HALF_TIME" : isFinished ? "FINISHED" : statusName,
+          winner,
           goals: [],
           bookings: [],
-          fixtureId,
-          stats,
         };
       }
 
@@ -313,8 +268,7 @@ function useLiveScores(selectedDate: string) {
 
     const id = setInterval(() => {
       const now = new Date();
-      const bstHour = (now.getUTCHours() + 1) % 24; // BST = UTC+1
-      // Poll during match windows: early morning (1am–6am) and evening (5pm–2am)
+      const bstHour = (now.getUTCHours() + 1) % 24;
       const inWindow = bstHour >= 17 || bstHour <= 6;
       if (inWindow) fetch_(selectedDate);
     }, 60_000);
@@ -395,36 +349,6 @@ function GdpBadge({ team, stats, align }: { team: string; stats: Record<string, 
   );
 }
 
-function StatRow({ label, homeVal, awayVal, homeColor }: { label: string; homeVal: string | number | null; awayVal: string | number | null; homeColor?: string }) {
-  if (homeVal == null && awayVal == null) return null;
-  const homeNum = parseFloat(String(homeVal ?? "0").replace("%", ""));
-  const awayNum = parseFloat(String(awayVal ?? "0").replace("%", ""));
-  const total = homeNum + awayNum || 1;
-  const homePct = (homeNum / total) * 100;
-  return (
-    <div className="mb-2">
-      <div className="flex justify-between mb-1" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.65rem", color: "#555" }}>
-        <span style={{ color: "#aaa" }}>{homeVal ?? "–"}</span>
-        <span style={{ color: "#555" }}>{label}</span>
-        <span style={{ color: "#aaa" }}>{awayVal ?? "–"}</span>
-      </div>
-      <div style={{ height: "4px", backgroundColor: "#222", display: "flex", overflow: "hidden" }}>
-        <div style={{ width: `${homePct}%`, backgroundColor: homeColor ?? "#39ff14", transition: "width 0.5s ease" }} />
-        <div style={{ flex: 1, backgroundColor: "#ff0088" }} />
-      </div>
-    </div>
-  );
-}
-
-function MatchStatBar({ stats, homeTeam, awayTeam }: { stats: any; homeTeam: string; awayTeam: string }) {
-  if (!stats) return null;
-  return (
-    <div className="mt-3 pt-3" style={{ borderTop: "1px dashed #2a2a2a" }}>
-      <StatRow label="POSSESSION" homeVal={stats.homePossession} awayVal={stats.awayPossession} />
-      <StatRow label="SHOTS ON TARGET" homeVal={stats.homeShotsOnTarget} awayVal={stats.awayShotsOnTarget} />
-    </div>
-  );
-}
 
 function TodayHeader() {
   const [phase, setPhase] = useState<"idle" | "shimmer" | "dissolve" | "gone">("idle");
@@ -520,7 +444,6 @@ export function TodayTab() {
         liveStatus: isLive ? live.status : isFinished ? "FT" : null,
         goals,
         bookings,
-        matchStats: live.stats,
       };
     }
     if (historical) {
@@ -769,7 +692,6 @@ export function TodayTab() {
                     </div>
                   )}
 
-                  <MatchStatBar stats={(fixture as any).matchStats} homeTeam={fixture.home} awayTeam={fixture.away} />
                 </div>
               </div>
             );

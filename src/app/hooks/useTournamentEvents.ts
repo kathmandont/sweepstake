@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { API_HEADERS, getOwner, PLAYER_TEAMS, normaliseTeam } from "../lib/sweepstake";
+import { getOwner, PLAYER_TEAMS, normaliseTeam } from "../lib/sweepstake";
 
 export type Goal = { minute: number; type: "REGULAR" | "OWN_GOAL" | "PENALTY"; scorer: string; team: string; matchLabel: string; date: string };
 export type Booking = { minute: number; type: "YELLOW_CARD" | "RED_CARD" | "YELLOW_RED_CARD"; player: string; team: string; matchLabel: string; date: string };
 
 export type MatchSummary = {
-  id: number;
+  id: string;
   date: string;
   homeTeam: string;
   awayTeam: string;
@@ -19,17 +19,32 @@ export type PrizeDetection = {
   firstRedCard: { player: string; team: string; opponent: string; minute: number; matchLabel: string } | null;
   firstOwnGoal: { player: string; team: string; scorer: string; minute: number; matchLabel: string } | null;
   highestScoringGame: { matchLabel: string; total: number; owners: string[] } | null;
-  yellowCardTotals: Record<string, number>; // sweepstake player → total yellows
+  yellowCardTotals: Record<string, number>;
 };
 
-const CACHE_PREFIX = "wc2026_match_v3_";
-const LIST_CACHE_KEY = "wc2026_list_v3";
+const CACHE_PREFIX = "wc2026_espn_match_v1_";
 const TODAY = new Date().toISOString().split("T")[0];
-const PAST_MATCH_TTL = Infinity;     // finished matches from previous days never expire
-const TODAY_MATCH_TTL = 15 * 60 * 1000;  // today's match details: 15 min
-const LIST_TTL = 30 * 60 * 1000;         // finished matches list: 30 min
+const PAST_MATCH_TTL = Infinity;
+const TODAY_MATCH_TTL = 15 * 60 * 1000;
 
-function getCached(id: number, matchDate: string): MatchSummary | null {
+// ESPN uses different names for some teams
+const ESPN_ALIASES: Record<string, string> = {
+  "Türkiye": "Turkey",
+  "Czechia": "Czech Republic",
+  "Ivory Coast": "Côte d'Ivoire",
+  "DR Congo": "Congo DR",
+  "Cape Verde": "Cape Verde Islands",
+  "Bosnia-Herzegovina": "Bosnia & Herzegovina",
+  "Curacao": "Curaçao",
+  "USA": "United States",
+  "South Korea": "Korea Republic",
+};
+
+function espnNormalise(name: string): string {
+  return normaliseTeam(ESPN_ALIASES[name] ?? name);
+}
+
+function getCached(id: string, matchDate: string): MatchSummary | null {
   try {
     const raw = localStorage.getItem(`${CACHE_PREFIX}${id}`);
     if (!raw) return null;
@@ -40,69 +55,57 @@ function getCached(id: number, matchDate: string): MatchSummary | null {
   } catch { return null; }
 }
 
-function setCache(id: number, data: MatchSummary) {
+function setCache(id: string, data: MatchSummary) {
   try { localStorage.setItem(`${CACHE_PREFIX}${id}`, JSON.stringify({ data, ts: Date.now() })); } catch {}
 }
 
-function getCachedList(): any[] | null {
-  try {
-    const raw = localStorage.getItem(LIST_CACHE_KEY);
-    if (!raw) return null;
-    const { data, ts } = JSON.parse(raw);
-    if (Date.now() - ts > LIST_TTL) return null;
-    return data;
-  } catch { return null; }
-}
-
-function setCachedList(data: any[]) {
-  try { localStorage.setItem(LIST_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch {}
-}
-
-async function fetchDetail(id: number, date: string, homeTeam: string, awayTeam: string): Promise<MatchSummary | null> {
+async function fetchMatchDetail(id: string, date: string, homeTeam: string, awayTeam: string): Promise<MatchSummary | null> {
   const cached = getCached(id, date);
   if (cached) return cached;
 
   try {
-    const res = await fetch(`https://api.football-data.org/v4/matches/${id}`, { headers: API_HEADERS });
+    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${id}`);
     if (!res.ok) return null;
     const data = await res.json();
     const matchLabel = `${homeTeam} vs ${awayTeam}`;
 
-    const goals: Goal[] = (data.goals ?? []).map((g: any) => ({
-      minute: g.minute,
-      type: g.type,
-      scorer: g.scorer?.name ?? "Unknown",
-      team: normaliseTeam(g.team?.name ?? ""),
-      matchLabel,
-      date,
-    }));
+    const goals: Goal[] = [];
+    const bookings: Booking[] = [];
 
-    const bookings: Booking[] = (data.bookings ?? []).map((b: any) => ({
-      minute: b.minute,
-      type: b.type,
-      player: b.player?.name ?? "Unknown",
-      team: normaliseTeam(b.team?.name ?? ""),
-      matchLabel,
-      date,
-    }));
+    for (const e of data.keyEvents ?? []) {
+      const eventType: string = e.type?.type ?? "";
+      const minute = Math.floor((e.clock?.value ?? 0) / 60);
+      const teamName = espnNormalise(e.team?.displayName ?? "");
+      const playerName = e.participants?.[0]?.athlete?.displayName ?? "Unknown";
 
-    const summary: MatchSummary = {
-      id,
-      date,
-      homeTeam,
-      awayTeam,
-      homeScore: data.score?.fullTime?.home ?? 0,
-      awayScore: data.score?.fullTime?.away ?? 0,
-      goals,
-      bookings,
-    };
+      if (eventType === "own-goal") {
+        goals.push({ minute, type: "OWN_GOAL", scorer: playerName, team: teamName, matchLabel, date });
+      } else if (eventType === "penalty---scored") {
+        goals.push({ minute, type: "PENALTY", scorer: playerName, team: teamName, matchLabel, date });
+      } else if (eventType.startsWith("goal")) {
+        goals.push({ minute, type: "REGULAR", scorer: playerName, team: teamName, matchLabel, date });
+      } else if (eventType === "yellow-card") {
+        bookings.push({ minute, type: "YELLOW_CARD", player: playerName, team: teamName, matchLabel, date });
+      } else if (eventType === "red-card") {
+        bookings.push({ minute, type: "RED_CARD", player: playerName, team: teamName, matchLabel, date });
+      } else if (eventType === "yellow-red-card") {
+        bookings.push({ minute, type: "YELLOW_RED_CARD", player: playerName, team: teamName, matchLabel, date });
+      }
+    }
 
+    const comp = data.header?.competitions?.[0];
+    let homeScore = 0;
+    let awayScore = 0;
+    for (const c of comp?.competitors ?? []) {
+      if (c.homeAway === "home") homeScore = parseInt(c.score ?? "0", 10);
+      if (c.homeAway === "away") awayScore = parseInt(c.score ?? "0", 10);
+    }
+
+    const summary: MatchSummary = { id, date, homeTeam, awayTeam, homeScore, awayScore, goals, bookings };
     setCache(id, summary);
     return summary;
   } catch { return null; }
 }
-
-function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
 
 export function useTournamentEvents() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
@@ -119,51 +122,48 @@ export function useTournamentEvents() {
 
     async function load() {
       try {
-        let finishedMatches: any[] = getCachedList() ?? [];
-        if (!finishedMatches.length) {
-          const res = await fetch(
-            "https://api.football-data.org/v4/competitions/2000/matches?status=FINISHED",
-            { headers: API_HEADERS }
-          );
-          if (!res.ok || cancelled) return;
-          const data = await res.json();
-          finishedMatches = data.matches ?? [];
-          setCachedList(finishedMatches);
-        }
-        if (cancelled) return;
+        // Single request gets all 102 WC matches across the tournament window
+        const res = await fetch(
+          "https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=200&dates=20260611-20260720"
+        );
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+
+        const finishedEvents = (data.events ?? []).filter(
+          (e: any) => e.status?.type?.name === "STATUS_FULL_TIME"
+        );
 
         const summaries: MatchSummary[] = [];
-        for (const m of finishedMatches) {
+        for (const event of finishedEvents) {
           if (cancelled) break;
-          const home = normaliseTeam(m.homeTeam?.name ?? "");
-          const away = normaliseTeam(m.awayTeam?.name ?? "");
-          const date = m.utcDate?.split("T")[0] ?? "";
-          const cached = getCached(m.id, date);
+          const comp = event.competitions?.[0];
+          const homeComp = comp?.competitors?.find((c: any) => c.homeAway === "home");
+          const awayComp = comp?.competitors?.find((c: any) => c.homeAway === "away");
+          const home = espnNormalise(homeComp?.team?.displayName ?? "");
+          const away = espnNormalise(awayComp?.team?.displayName ?? "");
+          const date = event.date?.split("T")[0] ?? "";
+
+          const cached = getCached(event.id, date);
           if (cached) {
             summaries.push(cached);
           } else {
-            const detail = await fetchDetail(m.id, date, home, away);
+            const detail = await fetchMatchDetail(event.id, date, home, away);
             if (detail) summaries.push(detail);
-            await sleep(300); // stay well under rate limit
           }
         }
 
         if (cancelled) return;
         setMatches(summaries);
 
-        // Prize detection
         const allGoals = summaries.flatMap(s => s.goals);
         const allBookings = summaries.flatMap(s => s.bookings);
 
-        // First red card
         const redCards = allBookings.filter(b => b.type === "RED_CARD" || b.type === "YELLOW_RED_CARD");
         const firstRed = redCards[0] ?? null;
 
-        // First own goal
         const ownGoals = allGoals.filter(g => g.type === "OWN_GOAL");
         const firstOG = ownGoals[0] ?? null;
 
-        // Highest scoring game
         let highestGame: PrizeDetection["highestScoringGame"] = null;
         for (const s of summaries) {
           const total = s.homeScore + s.awayScore;
@@ -173,7 +173,6 @@ export function useTournamentEvents() {
           }
         }
 
-        // Yellow card totals per sweepstake player
         const yellowTotals: Record<string, number> = {};
         for (const player of Object.keys(PLAYER_TEAMS)) yellowTotals[player] = 0;
         for (const b of allBookings) {
@@ -211,7 +210,6 @@ export function useTournamentEvents() {
     return () => { cancelled = true; };
   }, []);
 
-  // Map for quick lookup: "homeTeam|awayTeam" → MatchSummary
   const matchMap = Object.fromEntries(matches.map(m => [`${m.homeTeam}|${m.awayTeam}`, m]));
 
   return { matches, matchMap, prizes, loading };
