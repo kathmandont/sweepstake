@@ -312,9 +312,27 @@ function resolveOwner(team: string): string | null {
   return getOwner(ALIASES[team] ?? team);
 }
 
-function MatchEventSummary({ goals, bookings, isFinished }: { goals: Goal[]; bookings: Booking[]; isFinished: boolean }) {
+function GoalList({ goals, align }: { goals: Goal[]; align: "left" | "right" }) {
+  if (goals.length === 0) return <div style={{ flex: 1 }} />;
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: align === "right" ? "flex-end" : "flex-start" }}>
+      {goals.map((g, i) => (
+        <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color: g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : "#777", textAlign: align }}>
+          {align === "left"
+            ? <>{g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : "⚽"} {g.scorer} {g.minute}'</>
+            : <>{g.minute}' {g.scorer} {g.type === "OWN_GOAL" ? "OG ⚽" : g.type === "PENALTY" ? "pen. ⚽" : "⚽"}</>
+          }
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MatchEventSummary({ goals, bookings, isFinished, home, away }: { goals: Goal[]; bookings: Booking[]; isFinished: boolean; home: string; away: string }) {
   const hasEvents = goals.length > 0 || bookings.length > 0;
   if (!isFinished && !hasEvents) return null;
+  const homeGoals = goals.filter(g => g.team === home);
+  const awayGoals = goals.filter(g => g.team === away);
   return (
     <div className="mt-3 pt-2" style={{ borderTop: "1px dashed #2a2a2a" }}>
       {isFinished && !hasEvents && (
@@ -323,21 +341,10 @@ function MatchEventSummary({ goals, bookings, isFinished }: { goals: Goal[]; boo
         </span>
       )}
       {goals.length > 0 && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 mb-1">
-          {goals.map((g, i) => (
-            <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color: g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : "#777" }}>
-              {g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : "⚽"} {g.scorer} {g.minute}'
-            </span>
-          ))}
-        </div>
-      )}
-      {bookings.length > 0 && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          {bookings.map((b, i) => (
-            <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color: b.type === "RED_CARD" || b.type === "YELLOW_RED_CARD" ? "#ff4444" : "#bb8800" }}>
-              {b.type === "RED_CARD" ? "🟥" : b.type === "YELLOW_RED_CARD" ? "🟨🟥" : "🟨"} {b.player} {b.minute}'
-            </span>
-          ))}
+        <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+          <GoalList goals={homeGoals} align="left" />
+          <div style={{ flexShrink: 0, width: "70px" }} />
+          <GoalList goals={awayGoals} align="right" />
         </div>
       )}
     </div>
@@ -714,6 +721,8 @@ export function TodayTab() {
                     goals={(fixture as any).goals ?? []}
                     bookings={(fixture as any).bookings ?? []}
                     isFinished={(fixture as any).liveStatus === "FT"}
+                    home={fixture.home}
+                    away={fixture.away}
                   />
 
                   {/* Sweepstake narrative */}
