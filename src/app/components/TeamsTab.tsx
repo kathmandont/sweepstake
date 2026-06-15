@@ -72,9 +72,30 @@ const FLAGS: Record<string, string> = {
   "Congo DR": "🇨🇩", Paraguay: "🇵🇾", Germany: "🇩🇪", Canada: "🇨🇦", Iran: "🇮🇷", Colombia: "🇨🇴", "Côte d'Ivoire": "🇨🇮", Qatar: "🇶🇦",
 };
 
+const FLASH_STYLES = `
+  @keyframes flash-pulsate {
+    0%   { transform: scale(1); }
+    20%  { transform: scale(1.06) skewX(-1deg); }
+    40%  { transform: scale(0.96) skewX(1deg); }
+    60%  { transform: scale(1.08) skewX(-0.5deg); }
+    80%  { transform: scale(0.98); }
+    100% { transform: scale(1.04); }
+  }
+  @keyframes flash-distort {
+    0%   { transform: scale(1.04) skewX(-1deg) skewY(0deg); filter: brightness(1); }
+    15%  { transform: scale(1.12) skewX(8deg) skewY(-3deg) translateX(-12px); filter: brightness(1.4) hue-rotate(40deg); }
+    30%  { transform: scale(0.88) skewX(-10deg) skewY(4deg) translateX(16px); filter: brightness(0.6) hue-rotate(-60deg) saturate(3); }
+    45%  { transform: scale(1.15) skewX(6deg) scaleX(1.1) translateY(-8px); filter: brightness(1.6) contrast(2); }
+    60%  { transform: scale(0.82) skewX(-8deg) scaleY(1.15) translateX(-10px); filter: brightness(0.5) hue-rotate(90deg); }
+    75%  { transform: scale(1.1) skewX(12deg) skewY(-5deg) translateX(8px); filter: brightness(1.3) saturate(4) hue-rotate(-30deg); }
+    90%  { transform: scale(0.9) skewX(-5deg) translateY(6px); filter: brightness(0.7) contrast(1.5); }
+    100% { transform: scale(1.05) skewX(3deg); filter: brightness(1); }
+  }
+`;
+
 export function TeamsTab() {
   const [hovered, setHovered] = useState<number | null>(null);
-  const [flash, setFlash] = useState<"hidden" | "visible" | "fading">("hidden");
+  const [flash, setFlash] = useState<"hidden" | "visible" | "distorting" | "fading">("hidden");
   const [flashPlayer, setFlashPlayer] = useState<string>("");
   const allTeams = PLAYERS.flatMap(p => p.teams);
   const stats = getCountryStats(allTeams);
@@ -82,25 +103,28 @@ export function TeamsTab() {
   function triggerFlash(playerName: string) {
     setFlashPlayer(playerName);
     setFlash("visible");
-    setTimeout(() => setFlash("fading"), 500);
-    setTimeout(() => setFlash("hidden"), 1000);
+    setTimeout(() => setFlash("distorting"), 900);
+    setTimeout(() => setFlash("fading"), 1700);
+    setTimeout(() => setFlash("hidden"), 2300);
   }
 
   return (
     <div className="p-4 md:p-8">
+      <style>{FLASH_STYLES}</style>
 
-      {/* Flash overlay */}
-      {flash !== "hidden" && (
-        <div
-          style={{
-            position: "fixed", inset: 0, zIndex: 9999,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            backgroundColor: "rgba(0,0,0,0.9)",
-            opacity: flash === "fading" ? 0 : 1,
-            transition: flash === "fading" ? "opacity 0.5s ease-out" : "none",
-            pointerEvents: "none",
-          }}
-        >
+      {/* Flash overlay — always rendered so images stay decoded */}
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backgroundColor: "rgba(0,0,0,0.9)",
+          opacity: flash === "hidden" ? 0 : flash === "fading" ? 0 : 1,
+          transition: flash === "fading" ? "opacity 0.55s ease-out" : flash === "hidden" ? "none" : "opacity 0.08s ease-in",
+          pointerEvents: flash !== "hidden" && flash !== "fading" ? "auto" : "none",
+          visibility: flash === "hidden" ? "hidden" : "visible",
+        }}
+        onClick={() => flash !== "hidden" && setFlash("hidden")}
+      >
           <div style={{ position: "relative" }}>
             <img
               src={flashPlayer === "CHONKIE BOO" ? chonkieFlashImg : flashPlayer === "MEDLEY" ? medleyFlashImg : flashPlayer === "WIGGLES" ? wigglesFlashImg : flashPlayer === "BURGER" ? burgerFlashImg : flashPlayer === "TINY CANS" ? tinyCansFlashImg : flashImg}
@@ -114,15 +138,17 @@ export function TeamsTab() {
                   : flashPlayer === "WIGGLES"
                   ? "contrast(2.5) brightness(0.6) saturate(5) hue-rotate(180deg) blur(0.6px)"
                   : "contrast(1.3) brightness(0.85) saturate(0.6)",
-                transform: flashPlayer === "MEDLEY" || flashPlayer === "WIGGLES"
-                  ? "skewX(-2deg) scaleX(0.95) scale(1.05)"
-                  : "skewX(-1.5deg) scaleX(0.97)",
                 imageRendering: "pixelated",
                 boxShadow: flashPlayer === "MEDLEY"
                   ? "0 0 60px #ff00ff88, 0 0 120px #00ffff44"
                   : flashPlayer === "WIGGLES"
                   ? "0 0 60px #00ffff88, 0 0 120px #ff00ff44"
                   : "0 0 80px #39ff1422",
+                animation: flash === "visible"
+                  ? "flash-pulsate 0.9s ease-in-out"
+                  : flash === "distorting"
+                  ? "flash-distort 0.8s ease-in-out"
+                  : "none",
               }}
             />
             {/* Chromatic aberration layers */}
@@ -184,7 +210,6 @@ export function TeamsTab() {
             }} />
           </div>
         </div>
-      )}
 
       <div className="text-center mb-8">
         <div
