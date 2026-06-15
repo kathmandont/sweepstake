@@ -651,7 +651,7 @@ export function TodayTab() {
                   {/* Stage + time + TV */}
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#555", fontSize: "0.75rem" }}>
-                      {fixture.stage} · {fixture.time} BST
+                      {fixture.stage} · {fixture.time} BST{fixture.timeAEST && fixture.timeAEST !== "FT" ? ` · ${fixture.timeAEST} AEST` : ""}
                     </span>
                     {fixture.tv && (
                       <span
