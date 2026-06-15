@@ -84,7 +84,7 @@ const FIXTURES: { date: string; home: string; away: string; time: string; timeAE
   { date: "2026-06-18", home: "Switzerland", away: "Bosnia-Herzegovina", time: "8:00pm", timeAEST: "5:00am (+1)", stage: "Group B", tv: "ITV" },
   { date: "2026-06-18", home: "Canada", away: "Qatar", time: "11:00pm", timeAEST: "8:00am (+1)", stage: "Group B", tv: "ITV" },
   // June 19
-  { date: "2026-06-19", home: "Mexico", away: "South Africa", time: "2:00am", timeAEST: "11:00am", stage: "Group A", tv: "BBC" },
+  { date: "2026-06-19", home: "Mexico", away: "South Korea", time: "2:00am", timeAEST: "11:00am", stage: "Group A", tv: "BBC" },
   { date: "2026-06-19", home: "USA", away: "Australia", time: "8:00pm", timeAEST: "5:00am (+1)", stage: "Group D", tv: "BBC" },
   { date: "2026-06-19", home: "Scotland", away: "Morocco", time: "11:00pm", timeAEST: "8:00am (+1)", stage: "Group C", tv: "ITV" },
   // June 20
