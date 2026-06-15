@@ -436,7 +436,7 @@ export function TodayTab() {
     if (live) {
       const isFinished = live.status === "FINISHED";
       const isLive = ["IN_PLAY", "PAUSED", "HALF_TIME"].includes(live.status);
-      const hasScore = live.home !== null && live.away !== null;
+      const hasScore = (isLive || isFinished) && live.home !== null && live.away !== null;
       return {
         ...f,
         score: hasScore ? `${live.home} - ${live.away}` : isLive ? "? - ?" : f.score,
@@ -637,7 +637,7 @@ export function TodayTab() {
                         color: (fixture as any).liveStatus && (fixture as any).liveStatus !== "FT" ? "#39ff14" : fixture.score ? "#ffffff" : "#e8ff00",
                         whiteSpace: "nowrap",
                       }}>
-                        {fixture.score ?? "VS"}
+                        {fixture.score ?? fixture.time ?? "VS"}
                       </span>
                       {fixture.score && (fixture as any).liveStatus === "FT" && (
                         <div style={{ fontSize: "0.6rem", color: "#555", letterSpacing: "0.08em", marginTop: "2px" }}>
