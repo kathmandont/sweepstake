@@ -242,13 +242,23 @@ function useLiveScores(selectedDate: string) {
           else winner = "DRAW";
         }
 
+        const homeTeamId: string = homeComp?.team?.id ?? "";
+        const goals: Goal[] = (comp?.details ?? [])
+          .filter((d: any) => d.scoringPlay)
+          .map((d: any) => ({
+            minute: Math.floor((d.clock?.value ?? 0) / 60),
+            type: d.ownGoal ? "OWN_GOAL" : d.penaltyKick ? "PENALTY" : "REGULAR",
+            scorer: d.athletesInvolved?.[0]?.shortName ?? d.athletesInvolved?.[0]?.displayName ?? "Unknown",
+            team: d.team?.id === homeTeamId ? home : away,
+          }));
+
         updated[key] = {
           home: homeScore,
           away: awayScore,
           status: isLive ? "IN_PLAY" : isHalfTime ? "HALF_TIME" : isFinished ? "FINISHED" : statusName,
           clock: (isLive || isHalfTime) ? (event.status?.displayClock ?? null) : null,
           winner,
-          goals: [],
+          goals,
           bookings: [],
         };
       }
@@ -286,11 +296,11 @@ function resolveOwner(team: string): string | null {
 }
 
 function MatchEventSummary({ goals, bookings, isFinished }: { goals: Goal[]; bookings: Booking[]; isFinished: boolean }) {
-  if (!isFinished) return null;
   const hasEvents = goals.length > 0 || bookings.length > 0;
+  if (!isFinished && !hasEvents) return null;
   return (
     <div className="mt-3 pt-2" style={{ borderTop: "1px dashed #2a2a2a" }}>
-      {!hasEvents && (
+      {isFinished && !hasEvents && (
         <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#333", fontSize: "0.7rem" }}>
           loading match events...
         </span>
