@@ -22,7 +22,7 @@ export type PrizeDetection = {
   yellowCardTotals: Record<string, number>;
 };
 
-const CACHE_PREFIX = "wc2026_espn_match_v1_";
+const CACHE_PREFIX = "wc2026_espn_match_v2_";
 const TODAY = new Date().toISOString().split("T")[0];
 const PAST_MATCH_TTL = Infinity;
 const TODAY_MATCH_TTL = 15 * 60 * 1000;
@@ -79,7 +79,9 @@ async function fetchMatchDetail(id: string, date: string, homeTeam: string, away
       const playerName = e.participants?.[0]?.athlete?.displayName ?? "Unknown";
 
       if (eventType === "own-goal") {
-        goals.push({ minute, type: "OWN_GOAL", scorer: playerName, team: teamName, matchLabel, date });
+        // ESPN sets team to the benefiting side; we want the scorer's team
+        const ownGoalTeam = teamName === homeTeam ? awayTeam : homeTeam;
+        goals.push({ minute, type: "OWN_GOAL", scorer: playerName, team: ownGoalTeam, matchLabel, date });
       } else if (eventType === "penalty---scored") {
         goals.push({ minute, type: "PENALTY", scorer: playerName, team: teamName, matchLabel, date });
       } else if (eventType.startsWith("goal")) {
