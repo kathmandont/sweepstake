@@ -709,6 +709,13 @@ export function TodayTab() {
                     </div>
                   </div>
 
+                  {/* Goal scorers */}
+                  <MatchEventSummary
+                    goals={(fixture as any).goals ?? []}
+                    bookings={(fixture as any).bookings ?? []}
+                    isFinished={(fixture as any).liveStatus === "FT"}
+                  />
+
                   {/* Sweepstake narrative */}
                   {isSweepstakeMatch && (
                     <div
