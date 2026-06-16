@@ -13,6 +13,8 @@ export type MatchSummary = {
   awayScore: number;
   goals: Goal[];
   bookings: Booking[];
+  homeOffsides: number;
+  awayOffsides: number;
 };
 
 export type PrizeDetection = {
@@ -20,6 +22,7 @@ export type PrizeDetection = {
   firstOwnGoal: { player: string; team: string; scorer: string; minute: number; matchLabel: string } | null;
   highestScoringGame: { matchLabel: string; total: number; owners: string[] } | null;
   yellowCardTotals: Record<string, number>;
+  offsideTotals: Record<string, number>;
 };
 
 const CACHE_PREFIX = "wc2026_espn_match_v2_";
@@ -103,7 +106,18 @@ async function fetchMatchDetail(id: string, date: string, homeTeam: string, away
       if (c.homeAway === "away") awayScore = parseInt(c.score ?? "0", 10);
     }
 
-    const summary: MatchSummary = { id, date, homeTeam, awayTeam, homeScore, awayScore, goals, bookings };
+    let homeOffsides = 0;
+    let awayOffsides = 0;
+    const bsTeams = data.boxscore?.teams ?? [];
+    for (const t of bsTeams) {
+      const offsideStat = (t.statistics ?? []).find((s: any) => s.name === "offsides");
+      const val = parseInt(offsideStat?.displayValue ?? "0", 10);
+      const tName = espnNormalise(t.team?.displayName ?? "");
+      if (tName === homeTeam) homeOffsides = val;
+      else awayOffsides = val;
+    }
+
+    const summary: MatchSummary = { id, date, homeTeam, awayTeam, homeScore, awayScore, goals, bookings, homeOffsides, awayOffsides };
     setCache(id, summary);
     return summary;
   } catch { return null; }
@@ -116,6 +130,7 @@ export function useTournamentEvents() {
     firstOwnGoal: null,
     highestScoringGame: null,
     yellowCardTotals: {},
+    offsideTotals: {},
   });
   const [loading, setLoading] = useState(true);
 
@@ -183,6 +198,15 @@ export function useTournamentEvents() {
           if (owner) yellowTotals[owner] = (yellowTotals[owner] ?? 0) + 1;
         }
 
+        const offsideTotals: Record<string, number> = {};
+        for (const player of Object.keys(PLAYER_TEAMS)) offsideTotals[player] = 0;
+        for (const s of summaries) {
+          const homeOwner = getOwner(s.homeTeam);
+          const awayOwner = getOwner(s.awayTeam);
+          if (homeOwner) offsideTotals[homeOwner] = (offsideTotals[homeOwner] ?? 0) + s.homeOffsides;
+          if (awayOwner) offsideTotals[awayOwner] = (offsideTotals[awayOwner] ?? 0) + s.awayOffsides;
+        }
+
         setPrizes({
           firstRedCard: firstRed ? {
             player: getOwner(firstRed.team) ?? "Unknown",
@@ -200,6 +224,7 @@ export function useTournamentEvents() {
           } : null,
           highestScoringGame: highestGame,
           yellowCardTotals: yellowTotals,
+          offsideTotals,
         });
       } catch {
         // silently fail
