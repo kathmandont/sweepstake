@@ -152,33 +152,36 @@ function GroupTable({ group }: { group: string }) {
   const rows = computeStandings(group);
 
   return (
-    <div style={{ backgroundColor: "#0d0d0d", border: "2px solid #222", marginBottom: "1px" }}>
+    <div style={{ marginBottom: "24px" }}>
+      {/* Group header */}
       <div style={{
-        backgroundColor: "#111",
-        borderBottom: "2px solid #222",
-        padding: "8px 12px",
+        backgroundColor: "#e8ff00",
+        padding: "10px 16px",
         fontFamily: "'Black Han Sans', sans-serif",
-        fontSize: "0.8rem",
+        fontSize: "1.1rem",
         letterSpacing: "0.08em",
-        color: "#e8ff00",
+        color: "#000",
       }}>
         {group.toUpperCase()}
       </div>
 
-      {/* Header */}
+      {/* Column headers */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "28px 1fr 32px 32px",
-        padding: "4px 12px",
+        gridTemplateColumns: "36px 1fr 44px 44px 44px 52px",
+        padding: "6px 16px",
         fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "0.6rem",
+        fontSize: "0.65rem",
         color: "#444",
         letterSpacing: "0.06em",
-        borderBottom: "1px solid #1a1a1a",
+        borderBottom: "1px solid #222",
+        backgroundColor: "#0a0a0a",
       }}>
         <span></span>
         <span></span>
         <span style={{ textAlign: "center" }}>P</span>
+        <span style={{ textAlign: "center" }}>W</span>
+        <span style={{ textAlign: "center" }}>GD</span>
         <span style={{ textAlign: "center", color: "#e8ff00" }}>PTS</span>
       </div>
 
@@ -190,61 +193,67 @@ function GroupTable({ group }: { group: string }) {
             key={row.team}
             style={{
               display: "grid",
-              gridTemplateColumns: "28px 1fr 32px 32px",
+              gridTemplateColumns: "36px 1fr 44px 44px 44px 52px",
               alignItems: "center",
-              padding: "7px 12px",
-              borderBottom: i < rows.length - 1 ? "1px solid #111" : "none",
-              borderLeft: isQualified ? "3px solid #39ff14" : "3px solid transparent",
+              padding: "12px 16px",
+              borderBottom: "1px solid #1a1a1a",
+              backgroundColor: isQualified ? "#0f0f0f" : "#0a0a0a",
+              borderLeft: isQualified ? "4px solid #39ff14" : "4px solid transparent",
             }}
           >
             <span style={{
-              fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "0.7rem",
-              color: isQualified ? "#39ff14" : "#444",
+              fontFamily: "'VT323', monospace",
+              fontSize: "1.3rem",
+              color: isQualified ? "#39ff14" : "#333",
             }}>
               {i + 1}
             </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-              <span style={{ fontSize: "1rem", flexShrink: 0 }}>{FLAGS[row.team] || "🏳"}</span>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+              <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>{FLAGS[row.team] || "🏳"}</span>
               <span style={{
                 fontFamily: "'Black Han Sans', sans-serif",
-                fontSize: "0.8rem",
-                color: isQualified ? "#ffffff" : "#666",
+                fontSize: "0.95rem",
+                color: isQualified ? "#ffffff" : "#555",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}>
                 {row.team}
               </span>
-              {row.played > 0 && (
-                <span style={{
-                  fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: "0.55rem",
-                  color: "#333",
-                  marginLeft: "auto",
-                  paddingRight: "4px",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}>
-                  {row.won}W {row.drawn}D {row.lost}L{" "}
-                  <span style={{ color: gd > 0 ? "#39ff14" : gd < 0 ? "#ff4444" : "#555" }}>
-                    {gd > 0 ? "+" : ""}{gd}
-                  </span>
-                </span>
-              )}
             </div>
+
             <span style={{
               fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "0.7rem",
+              fontSize: "0.85rem",
               color: "#555",
               textAlign: "center",
             }}>
               {row.played}
             </span>
+
+            <span style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: "0.85rem",
+              color: "#555",
+              textAlign: "center",
+            }}>
+              {row.won}
+            </span>
+
+            <span style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: "0.85rem",
+              color: gd > 0 ? "#39ff14" : gd < 0 ? "#ff4444" : "#444",
+              textAlign: "center",
+            }}>
+              {gd > 0 ? "+" : ""}{gd}
+            </span>
+
             <span style={{
               fontFamily: "'VT323', monospace",
-              fontSize: "1.2rem",
-              color: isQualified ? "#e8ff00" : "#555",
+              fontSize: "1.6rem",
+              color: isQualified ? "#e8ff00" : "#444",
               textAlign: "center",
             }}>
               {row.points}
@@ -258,23 +267,21 @@ function GroupTable({ group }: { group: string }) {
 
 export function TablesTab() {
   return (
-    <div className="p-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "680px", margin: "0 auto", padding: "24px 16px" }}>
       <div style={{
-        fontFamily: "'Black Han Sans', sans-serif",
+        fontFamily: "'Share Tech Mono', monospace",
         fontSize: "0.65rem",
         letterSpacing: "0.08em",
         color: "#333",
-        marginBottom: "16px",
+        marginBottom: "24px",
         display: "flex",
         alignItems: "center",
         gap: "8px",
       }}>
-        <span style={{ width: "12px", height: "12px", borderLeft: "3px solid #39ff14", display: "inline-block" }}></span>
-        TOP 2 QUALIFY
+        <span style={{ display: "inline-block", width: 10, height: 10, borderLeft: "3px solid #39ff14", borderBottom: "3px solid #39ff14" }}></span>
+        GREEN BORDER = TOP 2 QUALIFY FOR ROUND OF 32
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px" }}>
-        {GROUPS.map(g => <GroupTable key={g} group={g} />)}
-      </div>
+      {GROUPS.map(g => <GroupTable key={g} group={g} />)}
     </div>
   );
 }
