@@ -260,7 +260,7 @@ const ADS = [
 function AdBanner() {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % ADS.length), 5000);
+    const t = setInterval(() => setIdx(i => (i + 1) % ADS.length), 6000);
     return () => clearInterval(t);
   }, []);
   const ad = ADS[idx];
