@@ -1,5 +1,6 @@
 import { useTournamentEvents } from "../hooks/useTournamentEvents";
 import { PLAYER_COLORS } from "../lib/sweepstake";
+import countImg from "../../imports/count-1200x675.jpg";
 
 const PLAYERS = ["BURGER", "WIGGLES", "CHONKIE BOO", "MEDLEY", "TINY CANS", "POOCH"];
 
@@ -23,7 +24,20 @@ export function TablesTab() {
   const max = ranked[0]?.total ?? 1;
 
   return (
-    <div style={{ maxWidth: "560px", margin: "0 auto", padding: "32px 16px" }}>
+    <div style={{ position: "relative", overflow: "hidden" }}>
+      {/* Background image — fades out at bottom */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        backgroundImage: `url(${countImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+        opacity: 0.12,
+        maskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
+        pointerEvents: "none",
+      }} />
+    <div style={{ position: "relative", maxWidth: "560px", margin: "0 auto", padding: "32px 16px" }}>
 
       {/* Header */}
       <div style={{ marginBottom: "40px", borderLeft: "4px solid #e8ff00", paddingLeft: "16px" }}>
@@ -144,6 +158,7 @@ export function TablesTab() {
       }}>
         UPDATES LIVE · BURGERSBALLSFOOTBALL.COM
       </div>
+    </div>
     </div>
   );
 }
