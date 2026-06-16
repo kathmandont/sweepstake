@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { TeamsTab } from "./components/TeamsTab";
 import { PrizesTab } from "./components/PrizesTab";
 import { TodayTab } from "./components/TodayTab";
+import { TablesTab } from "./components/TablesTab";
 import elvisImg from "../imports/image18-1.jpeg";
 
 const TABS = [
   { id: "today", label: "TODAY'S GAMES", icon: "📡" },
+  { id: "tables", label: "TABLES", icon: "📊" },
   { id: "teams", label: "THE TEAMS", icon: "⚽" },
   { id: "prizes", label: "THE PRIZES", icon: "🍔" },
 ];
@@ -371,6 +373,7 @@ export default function App() {
       {/* ===== CONTENT ===== */}
       <main className="max-w-7xl mx-auto">
         {activeTab === "today" && <TodayTab />}
+        {activeTab === "tables" && <TablesTab />}
         {activeTab === "teams" && <TeamsTab />}
         {activeTab === "prizes" && <PrizesTab />}
       </main>

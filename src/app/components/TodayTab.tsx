@@ -647,10 +647,11 @@ export function TodayTab() {
                           {(fixture as any).liveStatus === "HALF_TIME" ? "● HT" : "● LIVE"}
                         </div>
                       )}
-                      <span style={{
+                      <span className="score-flicker" style={{
                         fontSize: fixture.score ? "1.6rem" : "1.3rem",
                         color: (fixture as any).liveStatus && (fixture as any).liveStatus !== "FT" ? "#39ff14" : fixture.score ? "#ffffff" : "#e8ff00",
                         whiteSpace: "nowrap",
+                        cursor: "default",
                       }}>
                         {fixture.score ?? fixture.time ?? "VS"}
                       </span>
