@@ -614,7 +614,7 @@ export function TodayTab() {
                   {/* Stage + time + TV */}
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#555", fontSize: "0.75rem" }}>
-                      {fixture.stage} · {fixture.time} BST{fixture.timeAEST && fixture.timeAEST !== "FT" ? ` · ${fixture.timeAEST} AEST` : ""}{(fixture as any).venue ? ` · ${(fixture as any).venue}` : ""}
+                      {fixture.stage} · {fixture.time} BST{fixture.timeAEST && fixture.timeAEST !== "FT" ? ` · ${fixture.timeAEST} AEST` : ""}
                     </span>
                     {fixture.tv && (
                       <span
@@ -687,6 +687,11 @@ export function TodayTab() {
                       {fixture.score && (fixture as any).liveStatus === "FT" && (
                         <div style={{ fontSize: "0.6rem", color: "#555", letterSpacing: "0.08em", marginTop: "2px" }}>
                           FT
+                        </div>
+                      )}
+                      {(fixture as any).venue && (
+                        <div style={{ fontSize: "0.6rem", color: "#444", letterSpacing: "0.04em", marginTop: "4px", fontFamily: "'Share Tech Mono', monospace", whiteSpace: "nowrap" }}>
+                          {(fixture as any).venue}
                         </div>
                       )}
                       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }`}</style>
