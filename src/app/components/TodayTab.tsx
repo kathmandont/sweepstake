@@ -266,7 +266,7 @@ function useLiveScores(selectedDate: string) {
             minute: Math.floor((d.clock?.value ?? 0) / 60),
             type: d.ownGoal ? "OWN_GOAL" : d.penaltyKick ? "PENALTY" : "REGULAR",
             scorer: d.athletesInvolved?.[0]?.shortName ?? d.athletesInvolved?.[0]?.displayName ?? "Unknown",
-            team: d.team?.id === homeTeamId ? home : away,
+            team: d.ownGoal ? (d.team?.id === homeTeamId ? away : home) : (d.team?.id === homeTeamId ? home : away),
           }));
 
         updated[key] = {
