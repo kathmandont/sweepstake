@@ -260,19 +260,18 @@ const ADS = [
 function AdBanner() {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % ADS.length), 4000);
+    const t = setInterval(() => setIdx(i => (i + 1) % ADS.length), 5000);
     return () => clearInterval(t);
   }, []);
   const ad = ADS[idx];
   return (
-    <div style={{ borderTop: "2px solid #111", borderBottom: "2px solid #111", backgroundColor: "#080808", padding: "0", overflow: "hidden", position: "relative" }}>
+    <div style={{ backgroundColor: "#000", textAlign: "center", padding: "8px 0 0" }}>
       <div style={{
         fontFamily: "'Share Tech Mono', monospace",
         fontSize: "0.5rem",
         letterSpacing: "0.15em",
         color: "#222",
-        textAlign: "right",
-        padding: "4px 8px 0",
+        marginBottom: "4px",
       }}>
         ADVERTISEMENT
       </div>
@@ -280,15 +279,7 @@ function AdBanner() {
         key={idx}
         src={ad.img}
         alt={ad.alt}
-        style={{
-          display: "block",
-          width: "100%",
-          height: "auto",
-          maxHeight: "340px",
-          objectFit: "contain",
-          backgroundColor: "#000",
-          animation: "adFadeIn 0.4s ease",
-        }}
+        style={{ maxWidth: "100%", display: "inline-block", animation: "adFadeIn 0.4s ease" }}
       />
       <style>{`@keyframes adFadeIn { from { opacity: 0 } to { opacity: 1 } }`}</style>
     </div>
