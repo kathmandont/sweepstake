@@ -4,6 +4,8 @@ import { PrizesTab } from "./components/PrizesTab";
 import { TodayTab } from "./components/TodayTab";
 import { TablesTab } from "./components/TablesTab";
 import elvisImg from "../imports/image18-1.jpeg";
+import watersooImg from "../imports/watersoo.png";
+import mcribImg from "../imports/mcrib2.jpg";
 
 const TABS = [
   { id: "today", label: "TODAY'S GAMES", icon: "📡" },
@@ -250,6 +252,48 @@ function useFavicon() {
   }, []);
 }
 
+const ADS = [
+  { img: watersooImg, alt: "Watersoo" },
+  { img: mcribImg, alt: "McRib" },
+];
+
+function AdBanner() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx(i => (i + 1) % ADS.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+  const ad = ADS[idx];
+  return (
+    <div style={{ borderTop: "2px solid #111", borderBottom: "2px solid #111", backgroundColor: "#080808", padding: "0", overflow: "hidden", position: "relative" }}>
+      <div style={{
+        fontFamily: "'Share Tech Mono', monospace",
+        fontSize: "0.5rem",
+        letterSpacing: "0.15em",
+        color: "#222",
+        textAlign: "right",
+        padding: "4px 8px 0",
+      }}>
+        ADVERTISEMENT
+      </div>
+      <img
+        key={idx}
+        src={ad.img}
+        alt={ad.alt}
+        style={{
+          display: "block",
+          width: "100%",
+          maxHeight: "160px",
+          objectFit: "cover",
+          objectPosition: "center",
+          animation: "adFadeIn 0.4s ease",
+        }}
+      />
+      <style>{`@keyframes adFadeIn { from { opacity: 0 } to { opacity: 1 } }`}</style>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("today");
   useAnalytics();
@@ -377,6 +421,9 @@ export default function App() {
         {activeTab === "teams" && <TeamsTab />}
         {activeTab === "prizes" && <PrizesTab />}
       </main>
+
+      {/* ===== AD BANNER ===== */}
+      <AdBanner />
 
       {/* ===== FOOTER ===== */}
       <footer
