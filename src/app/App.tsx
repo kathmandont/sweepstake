@@ -279,9 +279,23 @@ function AdBanner() {
         key={idx}
         src={ad.img}
         alt={ad.alt}
-        style={{ maxWidth: "100%", display: "inline-block", animation: "adFadeIn 0.4s ease" }}
+        className="ad-glitch"
+        style={{ maxWidth: "100%", display: "inline-block" }}
       />
-      <style>{`@keyframes adFadeIn { from { opacity: 0 } to { opacity: 1 } }`}</style>
+      <style>{`
+        @keyframes adGlitch {
+          0%   { opacity: 0; transform: translateX(-8px) skewX(-5deg); filter: brightness(3) hue-rotate(90deg); }
+          5%   { opacity: 1; transform: translateX(6px) skewX(3deg);  filter: brightness(1) hue-rotate(0deg); }
+          10%  { opacity: 0; transform: translateX(-4px); filter: brightness(4) saturate(0); }
+          15%  { opacity: 1; transform: translateX(0) skewX(0); filter: none; }
+          20%  { opacity: 0.2; transform: translateX(10px) scaleY(1.04); filter: hue-rotate(180deg); }
+          25%  { opacity: 1; transform: translateX(-3px) scaleY(1); filter: none; }
+          30%  { opacity: 0; transform: skewX(8deg); filter: brightness(5); }
+          38%  { opacity: 1; transform: none; filter: none; }
+          100% { opacity: 1; transform: none; filter: none; }
+        }
+        .ad-glitch { animation: adGlitch 0.5s steps(1) 1; }
+      `}</style>
     </div>
   );
 }
