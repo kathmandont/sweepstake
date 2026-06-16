@@ -283,9 +283,10 @@ function AdBanner() {
         style={{
           display: "block",
           width: "100%",
-          maxHeight: "160px",
-          objectFit: "cover",
-          objectPosition: "center",
+          height: "auto",
+          maxHeight: "340px",
+          objectFit: "contain",
+          backgroundColor: "#000",
           animation: "adFadeIn 0.4s ease",
         }}
       />
