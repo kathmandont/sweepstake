@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { PLAYER_COLORS, getOwner } from "../lib/sweepstake";
 import { useTournamentEvents } from "../hooks/useTournamentEvents";
-import { getCountryStats } from "../hooks/useCountryStats";
 
 const FLAGS: Record<string, string> = {
   Morocco: "🇲🇦", Turkey: "🇹🇷", Austria: "🇦🇹", "Cape Verde Islands": "🇨🇻", "Cape Verde": "🇨🇻",
@@ -365,27 +364,6 @@ const TV_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 
-function GdpBadge({ team, stats, align }: { team: string; stats: Record<string, any>; align?: "right" }) {
-  const stat = stats[team];
-  const gdp = stat?.gdp_growth;
-  const funFact = stat?.funFact;
-  if (!stat) return null;
-  const positive = gdp == null ? null : gdp >= 0;
-  return (
-    <div style={{ textAlign: align === "right" ? "right" : "left", marginTop: "3px" }}>
-      {gdp != null && (
-        <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.65rem", color: positive ? "#39ff14" : "#ff4444" }}>
-          GDP {positive ? "▲" : "▼"} {gdp > 0 ? "+" : ""}{gdp.toFixed(1)}%
-        </div>
-      )}
-      {funFact && (
-        <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.62rem", color: "#555", marginTop: "1px" }}>
-          {funFact}
-        </div>
-      )}
-    </div>
-  );
-}
 
 
 function TodayHeader() {
@@ -457,8 +435,6 @@ export function TodayTab() {
 
   const { scores, lastFetched, fetching, apiError } = useLiveScores(selectedDate);
   const { matchMap } = useTournamentEvents();
-  const allTeams = [...new Set(FIXTURES.flatMap(f => [f.home, f.away]))];
-  const countryStats = getCountryStats(allTeams);
 
   const displayFixtures = FIXTURES.filter((f) => f.date === selectedDate).map((f) => {
     const liveKey = `${f.home}|${f.away}`;
@@ -655,7 +631,6 @@ export function TodayTab() {
                               → {homeOwner}
                             </div>
                           )}
-                          <GdpBadge team={fixture.home} stats={countryStats} />
                         </div>
                       </div>
                     </div>
@@ -717,7 +692,6 @@ export function TodayTab() {
                               {awayOwner} ←
                             </div>
                           )}
-                          <GdpBadge team={fixture.away} stats={countryStats} align="right" />
                         </div>
                         <span style={{ fontSize: "1.3rem", flexShrink: 0 }}>{FLAGS[fixture.away] || "🏳"}</span>
                       </div>
