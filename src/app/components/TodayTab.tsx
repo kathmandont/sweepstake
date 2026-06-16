@@ -195,6 +195,7 @@ type LiveScore = {
   winner: string | null;
   goals: Goal[];
   bookings: Booking[];
+  venue: string | null;
 };
 type LiveScores = Record<string, LiveScore>;
 
@@ -277,6 +278,7 @@ function useLiveScores(selectedDate: string) {
           winner,
           goals,
           bookings: [],
+          venue: comp?.venue?.fullName ?? null,
         };
       }
 
@@ -479,6 +481,7 @@ export function TodayTab() {
         winner: live.winner === "HOME_TEAM" ? f.home : live.winner === "AWAY_TEAM" ? f.away : live.winner === "DRAW" ? "DRAW" : undefined,
         liveStatus: isLive ? live.status : isFinished ? "FT" : null,
         liveClock: live.clock ?? null,
+        venue: live.venue ?? null,
         goals,
         bookings,
       };
@@ -611,7 +614,7 @@ export function TodayTab() {
                   {/* Stage + time + TV */}
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#555", fontSize: "0.75rem" }}>
-                      {fixture.stage} · {fixture.time} BST{fixture.timeAEST && fixture.timeAEST !== "FT" ? ` · ${fixture.timeAEST} AEST` : ""}
+                      {fixture.stage} · {fixture.time} BST{fixture.timeAEST && fixture.timeAEST !== "FT" ? ` · ${fixture.timeAEST} AEST` : ""}{(fixture as any).venue ? ` · ${(fixture as any).venue}` : ""}
                     </span>
                     {fixture.tv && (
                       <span
