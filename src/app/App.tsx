@@ -6,6 +6,7 @@ import { TablesTab } from "./components/TablesTab";
 import elvisImg from "../imports/image18-1.jpeg";
 import watersooImg from "../imports/watersoo.png";
 import mcribImg from "../imports/mcrib2.jpg";
+import ad3Img from "../imports/ad3.png";
 
 const TABS = [
   { id: "today", label: "TODAY'S GAMES", icon: "📡" },
@@ -255,6 +256,7 @@ function useFavicon() {
 const ADS = [
   { img: watersooImg, alt: "Watersoo" },
   { img: mcribImg, alt: "McRib" },
+  { img: ad3Img, alt: "Vintage Fast Food" },
 ];
 
 function AdBanner() {
