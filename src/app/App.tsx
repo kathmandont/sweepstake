@@ -265,7 +265,7 @@ function AdBanner() {
   }, []);
   const ad = ADS[idx];
   return (
-    <div style={{ backgroundColor: "#f1f3f4", borderTop: "1px solid #dadce0", borderBottom: "1px solid #dadce0", padding: "8px 12px" }}>
+    <div style={{ backgroundColor: "#f1f3f4", borderTop: "1px solid #dadce0", borderBottom: "1px solid #dadce0", padding: "8px 12px", maxWidth: "480px", margin: "0 auto" }}>
       {/* Google-style ad label row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
