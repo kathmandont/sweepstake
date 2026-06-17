@@ -296,7 +296,7 @@ function AdBanner() {
           src={ad.img}
           alt={ad.alt}
           className="ad-glitch"
-          style={{ maxWidth: "100%", display: "block" }}
+          style={{ width: "100%", display: "block" }}
         />
       </div>
 
