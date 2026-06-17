@@ -405,30 +405,44 @@ function TodayHeader() {
   const t = tickRef.current;
   const shimmerPos = `${((t * 5) % 220) - 60}%`;
 
-  if (phase === "gone") return null;
+  if (phase === "gone") return (
+    <img
+      src={squirrelImg}
+      alt="Alan Jackson"
+      style={{
+        width: "90px",
+        display: "inline-block",
+        marginBottom: "8px",
+        animation: "alanAppear 0.4s cubic-bezier(0.2,1.6,0.6,1) forwards",
+      }}
+    />
+  );
 
   return (
-    <div
-      className="inline-block border-4 px-6 py-3 mb-2 cursor-default"
-      onMouseEnter={() => { if (phase === "idle") setPhase("shimmer"); }}
-      style={{
-        borderColor: "#00ffff",
-        fontFamily: "'VT323', monospace",
-        fontSize: "1.2rem",
-        transition: phase === "dissolve" ? "opacity 0.6s ease-out, filter 0.6s ease-out, max-height 0.6s ease-out, padding 0.6s ease-out" : "none",
-        opacity: phase === "dissolve" ? 0 : 1,
-        filter: phase === "dissolve" ? "blur(16px) brightness(4)" : "none",
-        backgroundImage: phase === "shimmer"
-          ? `linear-gradient(105deg, transparent ${shimmerPos}, rgba(255,255,255,0.9) calc(${shimmerPos} + 60px), transparent calc(${shimmerPos} + 120px))`
-          : "none",
-        backgroundClip: phase === "shimmer" ? "text" : undefined,
-        WebkitBackgroundClip: phase === "shimmer" ? "text" : undefined,
-        color: phase === "shimmer" ? "transparent" : "#00ffff",
-        WebkitTextFillColor: phase === "shimmer" ? "transparent" : undefined,
-      }}
-    >
-      ★ TODAY'S ACTION ★ WHO IS PLAYING WHO ★
-    </div>
+    <>
+      <style>{`@keyframes alanAppear { from { opacity:0; transform: scale(0.2) rotate(-20deg); } to { opacity:1; transform: scale(1) rotate(0deg); } }`}</style>
+      <div
+        className="inline-block border-4 px-6 py-3 mb-2 cursor-default"
+        onMouseEnter={() => { if (phase === "idle") setPhase("shimmer"); }}
+        style={{
+          borderColor: "#00ffff",
+          fontFamily: "'VT323', monospace",
+          fontSize: "1.2rem",
+          transition: phase === "dissolve" ? "opacity 0.6s ease-out, filter 0.6s ease-out, max-height 0.6s ease-out, padding 0.6s ease-out" : "none",
+          opacity: phase === "dissolve" ? 0 : 1,
+          filter: phase === "dissolve" ? "blur(16px) brightness(4)" : "none",
+          backgroundImage: phase === "shimmer"
+            ? `linear-gradient(105deg, transparent ${shimmerPos}, rgba(255,255,255,0.9) calc(${shimmerPos} + 60px), transparent calc(${shimmerPos} + 120px))`
+            : "none",
+          backgroundClip: phase === "shimmer" ? "text" : undefined,
+          WebkitBackgroundClip: phase === "shimmer" ? "text" : undefined,
+          color: phase === "shimmer" ? "transparent" : "#00ffff",
+          WebkitTextFillColor: phase === "shimmer" ? "transparent" : undefined,
+        }}
+      >
+        ★ TODAY'S ACTION ★ WHO IS PLAYING WHO ★
+      </div>
+    </>
   );
 }
 
