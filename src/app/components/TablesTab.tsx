@@ -69,16 +69,16 @@ export function TablesTab() {
           letterSpacing: "0.02em",
           textTransform: "uppercase",
         }}>
-          PIECES
+          THE GREAT PIECE COUNT
         </div>
         <div style={{
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "0.65rem",
-          color: "#444",
+          color: "#555",
           marginTop: "6px",
           letterSpacing: "0.08em",
         }}>
-          chicken pieces consumed · world cup 2026
+          🍗 self-reported · honour system · no appeals
         </div>
       </div>
 
@@ -137,7 +137,7 @@ export function TablesTab() {
                     <div style={{
                       fontFamily: "'Black Han Sans', sans-serif",
                       fontSize: "1.15rem",
-                      color: row.score > 0 ? color : "#2e2e2e",
+                      color: color,
                       letterSpacing: "0.04em",
                       textTransform: "uppercase",
                       lineHeight: 1,
@@ -148,7 +148,7 @@ export function TablesTab() {
                     <div style={{
                       fontFamily: "'Share Tech Mono', monospace",
                       fontSize: "0.58rem",
-                      color: "#252525",
+                      color: "#444",
                       letterSpacing: "0.06em",
                     }}>
                       {LINES[row.name]}
@@ -159,7 +159,7 @@ export function TablesTab() {
                 <div style={{
                   fontFamily: "'VT323', monospace",
                   fontSize: "3rem",
-                  color: row.score > 0 ? color : "#191919",
+                  color: row.score > 0 ? color : "#333",
                   lineHeight: 1,
                   flexShrink: 0,
                 }}>
