@@ -69,13 +69,22 @@ export function TablesTab() {
           letterSpacing: "0.02em",
           textTransform: "uppercase",
         }}>
-          THE GREAT PIECE COUNT
+          ALAN JACKSON'S COUNT
         </div>
         <div style={{
           fontFamily: "'Share Tech Mono', monospace",
-          fontSize: "0.65rem",
-          color: "#555",
-          marginTop: "6px",
+          fontSize: "0.7rem",
+          color: "#e8ff00",
+          marginTop: "8px",
+          letterSpacing: "0.06em",
+        }}>
+          alan is watching you. judging your chicken stripping skills.
+        </div>
+        <div style={{
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: "0.58rem",
+          color: "#333",
+          marginTop: "4px",
           letterSpacing: "0.08em",
         }}>
           🍗 self-reported · honour system · no appeals

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { getCountryStats } from "../hooks/useCountryStats";
+import squirrelImg from "../../imports/squirrel.png";
 import flashImg from "../../imports/1.jpg";
 import chonkieFlashImg from "../../imports/5.jpg";
 import medleyFlashImg from "../../imports/3.jpg";
@@ -321,6 +322,54 @@ export function TeamsTab() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Alan Jackson */}
+      <div style={{ marginTop: "24px", border: "3px solid #e8ff00", backgroundColor: "#0d0d0d", position: "relative", overflow: "visible" }}>
+        <img
+          src={squirrelImg}
+          alt="Alan Jackson"
+          style={{
+            position: "absolute",
+            top: "-60px",
+            right: "16px",
+            width: "100px",
+            pointerEvents: "none",
+            zIndex: 5,
+          }}
+        />
+        <div style={{ backgroundColor: "#e8ff00", color: "#000", padding: "12px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
+          <span style={{ fontFamily: "'Black Han Sans', sans-serif", fontSize: "1.5rem", letterSpacing: "0.05em" }}>
+            ALAN JACKSON
+          </span>
+          <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.65rem", letterSpacing: "0.08em" }}>
+            official mascot · chief judge · chicken correspondent
+          </span>
+        </div>
+        <div className="p-3 grid grid-cols-2 gap-1">
+          {[
+            { flag: "🇬🇧", name: "Chicken Bone" },
+            { flag: "🇫🇷", name: "Os de Poulet" },
+            { flag: "🇪🇸", name: "Hueso de Pollo" },
+            { flag: "🇩🇪", name: "Hühnerknochen" },
+            { flag: "🇯🇵", name: "鶏の骨" },
+            { flag: "🇧🇷", name: "Osso de Frango" },
+            { flag: "🇸🇦", name: "عظمة دجاج" },
+            { flag: "🇮🇹", name: "Osso di Pollo" },
+          ].map((t) => (
+            <div
+              key={t.name}
+              className="flex items-center gap-2 px-2 py-1"
+              style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.78rem", color: "#cccccc", borderLeft: "2px solid #e8ff0044" }}
+            >
+              <span>{t.flag}</span>
+              <span className="truncate flex-1">{t.name}</span>
+            </div>
+          ))}
+        </div>
+        <div className="px-4 py-2 text-right" style={{ fontFamily: "'VT323', monospace", color: "#e8ff00", fontSize: "0.9rem" }}>
+          watching. always watching. ▶
+        </div>
       </div>
 
       {/* Team lookup */}
