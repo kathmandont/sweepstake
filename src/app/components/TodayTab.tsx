@@ -315,16 +315,33 @@ function resolveOwner(team: string): string | null {
 
 function GoalList({ goals, align }: { goals: Goal[]; align: "left" | "right" }) {
   if (goals.length === 0) return <div style={{ flex: 1 }} />;
+
+  // Group consecutive entries by scorer+type, combine minutes
+  const grouped: { scorer: string; type: Goal["type"]; minutes: number[] }[] = [];
+  for (const g of goals) {
+    const last = grouped[grouped.length - 1];
+    if (last && last.scorer === g.scorer && last.type === g.type) {
+      last.minutes.push(g.minute);
+    } else {
+      grouped.push({ scorer: g.scorer, type: g.type, minutes: [g.minute] });
+    }
+  }
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: align === "right" ? "flex-end" : "flex-start" }}>
-      {goals.map((g, i) => (
-        <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color: g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : "#777", textAlign: align }}>
-          {align === "left"
-            ? <>{g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : "⚽"} {g.scorer} {g.minute}'</>
-            : <>{g.minute}' {g.scorer} {g.type === "OWN_GOAL" ? "OG ⚽" : g.type === "PENALTY" ? "pen. ⚽" : "⚽"}</>
-          }
-        </span>
-      ))}
+      {grouped.map((g, i) => {
+        const mins = g.minutes.map(m => `${m}'`).join(", ");
+        const icon = g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : "⚽";
+        const color = g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : "#777";
+        return (
+          <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color, textAlign: align }}>
+            {align === "left"
+              ? <>{icon} {g.scorer} {mins}</>
+              : <>{mins} {g.scorer} {icon}</>
+            }
+          </span>
+        );
+      })}
     </div>
   );
 }
@@ -332,8 +349,9 @@ function GoalList({ goals, align }: { goals: Goal[]; align: "left" | "right" }) 
 function MatchEventSummary({ goals, bookings, isFinished, home, away }: { goals: Goal[]; bookings: Booking[]; isFinished: boolean; home: string; away: string }) {
   const hasEvents = goals.length > 0 || bookings.length > 0;
   if (!isFinished && !hasEvents) return null;
-  const homeGoals = goals.filter(g => g.team === home);
-  const awayGoals = goals.filter(g => g.team === away);
+  // Own goals are stored under the scorer's team but should display under the benefiting team
+  const homeGoals = goals.filter(g => g.type === "OWN_GOAL" ? g.team === away : g.team === home);
+  const awayGoals = goals.filter(g => g.type === "OWN_GOAL" ? g.team === home : g.team === away);
   return (
     <div className="mt-3 pt-2" style={{ borderTop: "1px dashed #2a2a2a" }}>
       {isFinished && !hasEvents && (
