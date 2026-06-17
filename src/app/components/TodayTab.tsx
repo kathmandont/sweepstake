@@ -432,6 +432,50 @@ function TodayHeader() {
   );
 }
 
+function SpinningSquirrel() {
+  const [spun, setSpun] = useState(false);
+  const [spinning, setSpinning] = useState(false);
+
+  function handleHover() {
+    if (spinning || spun) return;
+    setSpinning(true);
+    setTimeout(() => {
+      setSpinning(false);
+      setSpun(true);
+    }, 600);
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes squirrelSpin {
+          0%   { transform: scaleX(-1) rotate(0deg); }
+          100% { transform: scaleX(-1) rotate(1080deg); }
+        }
+      `}</style>
+      <img
+        src={squirrelImg}
+        alt="Alan Jackson"
+        onMouseEnter={handleHover}
+        style={{
+          position: "absolute",
+          top: "-52px",
+          right: "12px",
+          width: "70px",
+          zIndex: 5,
+          cursor: "pointer",
+          transformOrigin: "center center",
+          transform: spun
+            ? "scaleX(-1) rotate(180deg)"
+            : "scaleX(-1) rotate(0deg)",
+          animation: spinning ? "squirrelSpin 0.6s cubic-bezier(0.2, 0, 0.8, 1) forwards" : "none",
+          transition: spinning ? "none" : "none",
+        }}
+      />
+    </>
+  );
+}
+
 export function TodayTab() {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(today);
@@ -591,21 +635,7 @@ export function TodayTab() {
                 }}
               >
                 {/* Squirrel perching */}
-                {showSquirrel && (
-                  <img
-                    src={squirrelImg}
-                    alt=""
-                    style={{
-                      position: "absolute",
-                      top: "-52px",
-                      right: "12px",
-                      width: "70px",
-                      pointerEvents: "none",
-                      zIndex: 5,
-                      transform: "scaleX(-1)",
-                    }}
-                  />
-                )}
+                {showSquirrel && <SpinningSquirrel />}
                 {/* Sweepstake badge */}
                 {isSweepstakeMatch && (
                   <div
