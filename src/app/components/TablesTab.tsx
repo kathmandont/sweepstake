@@ -1,164 +1,197 @@
-import { useTournamentEvents } from "../hooks/useTournamentEvents";
+import squirrelImg from "../../imports/squirrel.png";
 import { PLAYER_COLORS } from "../lib/sweepstake";
-import countImg from "../../imports/count-1200x675.jpg";
 
 const PLAYERS = ["BURGER", "WIGGLES", "CHONKIE BOO", "MEDLEY", "TINY CANS", "POOCH"];
 
-const SUBTITLES: Record<string, string> = {
-  BURGER:       "deep in the mix",
-  WIGGLES:      "making moves",
-  "CHONKIE BOO":"out there doing things",
-  MEDLEY:       "fully committed",
-  "TINY CANS":  "showing up",
-  POOCH:        "on the radar",
+// UPDATE THESE SCORES
+const SCORES: Record<string, number> = {
+  BURGER: 0,
+  WIGGLES: 0,
+  "CHONKIE BOO": 0,
+  MEDLEY: 0,
+  "TINY CANS": 0,
+  POOCH: 0,
+};
+
+const LINES: Record<string, string> = {
+  BURGER:       "steady hands, committed jaw",
+  WIGGLES:      "no sauce. no apology.",
+  "CHONKIE BOO":"technique under review",
+  MEDLEY:       "the bone has been addressed",
+  "TINY CANS":  "consistent. relentless.",
+  POOCH:        "still going",
 };
 
 export function TablesTab() {
-  const { prizes, loading } = useTournamentEvents();
-  const totals = prizes.offsideTotals;
-
   const ranked = [...PLAYERS]
-    .map(p => ({ name: p, total: totals[p] ?? 0 }))
-    .sort((a, b) => b.total - a.total);
+    .map(p => ({ name: p, score: SCORES[p] ?? 0 }))
+    .sort((a, b) => b.score - a.score);
 
-  const max = ranked[0]?.total ?? 1;
+  const max = Math.max(...ranked.map(r => r.score), 1);
+  const leader = ranked[0];
 
   return (
-    <div style={{ position: "relative", overflow: "hidden" }}>
-      {/* Background image — fades out at bottom */}
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        backgroundImage: `url(${countImg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-        opacity: 0.12,
-        maskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
-        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
-        pointerEvents: "none",
-      }} />
-    <div style={{ position: "relative", maxWidth: "560px", margin: "0 auto", padding: "32px 16px" }}>
+    <div style={{ maxWidth: "580px", margin: "0 auto", padding: "32px 16px", position: "relative" }}>
+
+      {/* Squirrel — top right */}
+      <img
+        src={squirrelImg}
+        alt=""
+        style={{
+          position: "absolute",
+          top: "-10px",
+          right: "-10px",
+          width: "130px",
+          opacity: 0.92,
+          pointerEvents: "none",
+          transform: "scaleX(-1)",
+          zIndex: 2,
+        }}
+      />
 
       {/* Header */}
-      <div style={{ marginBottom: "40px", borderLeft: "4px solid #e8ff00", paddingLeft: "16px" }}>
+      <div style={{ marginBottom: "36px", paddingRight: "100px" }}>
         <div style={{
           fontFamily: "'Share Tech Mono', monospace",
-          fontSize: "0.65rem",
-          letterSpacing: "0.15em",
-          color: "#444",
-          marginBottom: "8px",
+          fontSize: "0.6rem",
+          letterSpacing: "0.18em",
+          color: "#333",
+          marginBottom: "6px",
           textTransform: "uppercase",
         }}>
-          Burger's World Cup 2026 · Live standings
+          Burger's World Cup 2026 · official standings
         </div>
         <div style={{
           fontFamily: "'Black Han Sans', sans-serif",
-          fontSize: "2rem",
+          fontSize: "2.2rem",
           color: "#ffffff",
           lineHeight: 1,
-          letterSpacing: "0.03em",
+          letterSpacing: "0.02em",
           textTransform: "uppercase",
         }}>
-          THE COUNT
+          PIECES
+        </div>
+        <div style={{
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: "0.65rem",
+          color: "#444",
+          marginTop: "6px",
+          letterSpacing: "0.08em",
+        }}>
+          chicken pieces consumed · world cup 2026
         </div>
       </div>
 
-      {loading ? (
+      {/* Leader callout */}
+      {leader.score > 0 && (
         <div style={{
+          border: `2px solid ${PLAYER_COLORS[leader.name] ?? "#e8ff00"}`,
+          padding: "12px 16px",
+          marginBottom: "28px",
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "0.7rem",
-          color: "#333",
-          letterSpacing: "0.12em",
-          padding: "48px 0",
-          textAlign: "center",
+          color: "#555",
+          letterSpacing: "0.05em",
+          lineHeight: 1.8,
         }}>
-          loading...
+          <span style={{
+            fontFamily: "'Black Han Sans', sans-serif",
+            fontSize: "0.95rem",
+            color: PLAYER_COLORS[leader.name] ?? "#e8ff00",
+          }}>
+            {leader.name}
+          </span>
+          {" "}leads with {leader.score} piece{leader.score !== 1 ? "s" : ""}. {LINES[leader.name]}.
         </div>
-      ) : (
-        <div>
-          {ranked.map((row, i) => {
-            const color = PLAYER_COLORS[row.name] ?? "#ffffff";
-            const isLeader = i === 0 && row.total > 0;
-            const barWidth = max > 0 ? Math.round((row.total / max) * 100) : 0;
+      )}
 
-            return (
-              <div
-                key={row.name}
-                style={{
-                  marginBottom: "2px",
-                  padding: "20px 0",
-                  borderBottom: "1px solid #151515",
-                }}
-              >
-                {/* Name row */}
-                <div style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  marginBottom: "10px",
-                  gap: "16px",
-                }}>
+      {/* Rows */}
+      <div>
+        {ranked.map((row, i) => {
+          const color = PLAYER_COLORS[row.name] ?? "#ffffff";
+          const barPct = max > 0 ? Math.round((row.score / max) * 100) : 0;
+          const isFirst = i === 0 && row.score > 0;
+
+          return (
+            <div key={row.name} style={{
+              padding: "18px 0",
+              borderBottom: "1px solid #111",
+            }}>
+              <div style={{
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+                gap: "12px",
+                marginBottom: "10px",
+              }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "14px" }}>
+                  <span style={{
+                    fontFamily: "'VT323', monospace",
+                    fontSize: "1.1rem",
+                    color: isFirst ? color : "#2a2a2a",
+                    minWidth: "18px",
+                  }}>
+                    {i + 1}
+                  </span>
                   <div>
                     <div style={{
                       fontFamily: "'Black Han Sans', sans-serif",
-                      fontSize: "1.25rem",
-                      color: row.total > 0 ? color : "#333",
+                      fontSize: "1.15rem",
+                      color: row.score > 0 ? color : "#2e2e2e",
                       letterSpacing: "0.04em",
                       textTransform: "uppercase",
                       lineHeight: 1,
-                      marginBottom: "4px",
+                      marginBottom: "3px",
                     }}>
                       {row.name}
                     </div>
                     <div style={{
                       fontFamily: "'Share Tech Mono', monospace",
-                      fontSize: "0.6rem",
-                      color: "#2a2a2a",
-                      letterSpacing: "0.08em",
+                      fontSize: "0.58rem",
+                      color: "#252525",
+                      letterSpacing: "0.06em",
                     }}>
-                      {SUBTITLES[row.name] ?? ""}
+                      {LINES[row.name]}
                     </div>
                   </div>
-
-                  <div style={{
-                    fontFamily: "'VT323', monospace",
-                    fontSize: "3rem",
-                    color: row.total > 0 ? color : "#1a1a1a",
-                    lineHeight: 1,
-                    flexShrink: 0,
-                  }}>
-                    {row.total}
-                  </div>
                 </div>
 
-                {/* Bar */}
-                <div style={{ height: "3px", backgroundColor: "#111", width: "100%" }}>
-                  {row.total > 0 && (
-                    <div style={{
-                      height: "100%",
-                      width: `${barWidth}%`,
-                      backgroundColor: isLeader ? color : "#222",
-                      transition: "width 0.4s ease",
-                    }} />
-                  )}
+                <div style={{
+                  fontFamily: "'VT323', monospace",
+                  fontSize: "3rem",
+                  color: row.score > 0 ? color : "#191919",
+                  lineHeight: 1,
+                  flexShrink: 0,
+                }}>
+                  {row.score}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              {/* Bar */}
+              <div style={{ height: "2px", backgroundColor: "#111" }}>
+                {row.score > 0 && (
+                  <div style={{
+                    height: "100%",
+                    width: `${barPct}%`,
+                    backgroundColor: isFirst ? color : "#1e1e1e",
+                  }} />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       <div style={{
-        marginTop: "40px",
+        marginTop: "32px",
         fontFamily: "'Share Tech Mono', monospace",
         fontSize: "0.55rem",
-        color: "#1e1e1e",
+        color: "#1a1a1a",
         letterSpacing: "0.1em",
         lineHeight: 2,
       }}>
-        UPDATES LIVE · BURGERSBALLSFOOTBALL.COM
+        SELF REPORTED · HONOUR SYSTEM · NO APPEALS
       </div>
-    </div>
     </div>
   );
 }

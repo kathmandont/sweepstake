@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { PLAYER_COLORS, getOwner } from "../lib/sweepstake";
 import { useTournamentEvents } from "../hooks/useTournamentEvents";
+import squirrelImg from "../../imports/squirrel.png";
 
 const FLAGS: Record<string, string> = {
   Morocco: "🇲🇦", Turkey: "🇹🇷", Austria: "🇦🇹", "Cape Verde Islands": "🇨🇻", "Cape Verde": "🇨🇻",
@@ -575,6 +576,7 @@ export function TodayTab() {
             const awayOwner = resolveOwner(fixture.away);
             const isSweepstakeMatch = homeOwner || awayOwner;
             const tv = TV_COLORS[fixture.tv] ?? TV_COLORS.TBC;
+            const showSquirrel = idx % 4 === 2;
 
             return (
               <div
@@ -585,9 +587,25 @@ export function TodayTab() {
                     : "2px solid #222",
                   backgroundColor: isSweepstakeMatch ? "#111" : "#0d0d0d",
                   position: "relative",
-                  overflow: "hidden",
+                  overflow: "visible",
                 }}
               >
+                {/* Squirrel perching */}
+                {showSquirrel && (
+                  <img
+                    src={squirrelImg}
+                    alt=""
+                    style={{
+                      position: "absolute",
+                      top: "-52px",
+                      right: "12px",
+                      width: "70px",
+                      pointerEvents: "none",
+                      zIndex: 5,
+                      transform: "scaleX(-1)",
+                    }}
+                  />
+                )}
                 {/* Sweepstake badge */}
                 {isSweepstakeMatch && (
                   <div
