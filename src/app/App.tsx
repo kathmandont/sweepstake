@@ -265,23 +265,46 @@ function AdBanner() {
   }, []);
   const ad = ADS[idx];
   return (
-    <div style={{ backgroundColor: "#000", textAlign: "center", padding: "8px 0 0" }}>
-      <div style={{
-        fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "0.5rem",
-        letterSpacing: "0.15em",
-        color: "#222",
-        marginBottom: "4px",
-      }}>
-        ADVERTISEMENT
+    <div style={{ backgroundColor: "#f1f3f4", borderTop: "1px solid #dadce0", borderBottom: "1px solid #dadce0", padding: "8px 12px" }}>
+      {/* Google-style ad label row */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{
+            fontFamily: "Arial, sans-serif",
+            fontSize: "0.6rem",
+            color: "#006621",
+            border: "1px solid #006621",
+            borderRadius: "2px",
+            padding: "0px 3px",
+            letterSpacing: "0.02em",
+            fontWeight: 700,
+          }}>Ad</span>
+          <span style={{ fontFamily: "Arial, sans-serif", fontSize: "0.65rem", color: "#202124", letterSpacing: 0 }}>
+            burgersballsfootball.com
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          <span style={{ fontFamily: "Arial, sans-serif", fontSize: "0.55rem", color: "#70757a" }}>Why this ad?</span>
+          <span style={{ fontSize: "0.7rem", color: "#70757a", lineHeight: 1 }}>ⓘ</span>
+        </div>
       </div>
-      <img
-        key={idx}
-        src={ad.img}
-        alt={ad.alt}
-        className="ad-glitch"
-        style={{ maxWidth: "100%", display: "inline-block" }}
-      />
+
+      {/* Ad image */}
+      <div style={{ backgroundColor: "#fff", border: "1px solid #dadce0", textAlign: "center", overflow: "hidden" }}>
+        <img
+          key={idx}
+          src={ad.img}
+          alt={ad.alt}
+          className="ad-glitch"
+          style={{ maxWidth: "100%", display: "block" }}
+        />
+      </div>
+
+      {/* Bottom label */}
+      <div style={{ marginTop: "5px", fontFamily: "Arial, sans-serif", fontSize: "0.55rem", color: "#70757a", textAlign: "right" }}>
+        Sponsored · Advertisement
+      </div>
+
       <style>{`
         @keyframes adGlitch {
           0%   { opacity: 0; transform: translateX(-8px) skewX(-5deg); filter: brightness(3) hue-rotate(90deg); }
