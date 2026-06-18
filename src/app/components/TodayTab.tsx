@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { PLAYER_COLORS, getOwner } from "../lib/sweepstake";
 import { useTournamentEvents } from "../hooks/useTournamentEvents";
 import squirrelImg from "../../imports/squirrel.png";
+import robotSquirrelImg from "../../imports/robot-squirrel.png";
 import FORECASTS from "../data/forecasts.json";
 
 const FLAGS: Record<string, string> = {
@@ -799,10 +800,11 @@ export function TodayTab() {
                         className="mt-3 px-3 py-2"
                         style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "center", gap: "10px" }}
                       >
-                        <span style={{ fontSize: "1rem", flexShrink: 0 }}>🤖</span>
+                        <img src={robotSquirrelImg} alt="robot squirrel" style={{ width: "28px", height: "28px", objectFit: "cover", flexShrink: 0, borderRadius: "2px" }} />
                         <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#666", fontSize: "0.75rem", lineHeight: 1.4 }}>
                           {fc.prediction}
                           <span style={{ color: "#e8ff00", marginLeft: "8px", fontFamily: "'VT323', monospace", fontSize: "1rem" }}>{fc.score}</span>
+                          <span style={{ color: (fc as any).confidence >= 80 ? "#39ff14" : (fc as any).confidence >= 65 ? "#e8ff00" : "#ff6b35", marginLeft: "8px", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.7rem" }}>{(fc as any).confidence}%</span>
                         </span>
                       </div>
                     );
