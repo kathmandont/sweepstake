@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { PLAYER_COLORS, getOwner } from "../lib/sweepstake";
 import { useTournamentEvents } from "../hooks/useTournamentEvents";
 import squirrelImg from "../../imports/squirrel.png";
+import FORECASTS from "../data/forecasts.json";
 
 const FLAGS: Record<string, string> = {
   Morocco: "🇲🇦", Turkey: "🇹🇷", Austria: "🇦🇹", "Cape Verde Islands": "🇨🇻", "Cape Verde": "🇨🇻",
@@ -787,6 +788,25 @@ export function TodayTab() {
                     home={fixture.home}
                     away={fixture.away}
                   />
+
+                  {/* AI forecast — group stage only, unplayed matches */}
+                  {!fixture.score && fixture.stage.startsWith("Group") && (() => {
+                    const key = `${fixture.home} vs ${fixture.away}` as keyof typeof FORECASTS;
+                    const fc = FORECASTS[key];
+                    if (!fc) return null;
+                    return (
+                      <div
+                        className="mt-3 px-3 py-2"
+                        style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "flex-start", gap: "8px" }}
+                      >
+                        <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#e8ff00", fontSize: "0.65rem", flexShrink: 0, paddingTop: "1px", letterSpacing: "0.05em" }}>AI</span>
+                        <div>
+                          <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#555", fontSize: "0.72rem" }}>{fc.prediction}</span>
+                          <span style={{ fontFamily: "'VT323', monospace", color: "#444", fontSize: "0.9rem", marginLeft: "8px" }}>{fc.score}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Sweepstake narrative */}
                   {isSweepstakeMatch && (
