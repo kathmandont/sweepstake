@@ -797,13 +797,13 @@ export function TodayTab() {
                     return (
                       <div
                         className="mt-3 px-3 py-2"
-                        style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "flex-start", gap: "8px" }}
+                        style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "center", gap: "10px" }}
                       >
-                        <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#e8ff00", fontSize: "0.65rem", flexShrink: 0, paddingTop: "1px", letterSpacing: "0.05em" }}>AI</span>
-                        <div>
-                          <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#555", fontSize: "0.72rem" }}>{fc.prediction}</span>
-                          <span style={{ fontFamily: "'VT323', monospace", color: "#444", fontSize: "0.9rem", marginLeft: "8px" }}>{fc.score}</span>
-                        </div>
+                        <span style={{ fontSize: "1rem", flexShrink: 0 }}>🤖</span>
+                        <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#666", fontSize: "0.75rem", lineHeight: 1.4 }}>
+                          {fc.prediction}
+                          <span style={{ color: "#e8ff00", marginLeft: "8px", fontFamily: "'VT323', monospace", fontSize: "1rem" }}>{fc.score}</span>
+                        </span>
                       </div>
                     );
                   })()}
