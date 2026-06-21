@@ -790,22 +790,59 @@ export function TodayTab() {
                     away={fixture.away}
                   />
 
-                  {/* AI forecast — group stage only, unplayed matches */}
-                  {!fixture.score && fixture.stage.startsWith("Group") && (() => {
+                  {/* AI forecast — group stage only */}
+                  {fixture.stage.startsWith("Group") && (() => {
                     const key = `${fixture.home} vs ${fixture.away}` as keyof typeof FORECASTS;
-                    const fc = FORECASTS[key];
+                    const fc = FORECASTS[key] as any;
                     if (!fc) return null;
+
+                    const isFinished = fixture.score && ((fixture as any).liveStatus === "FT" || fixture.time === "FT");
+
+                    if (!isFinished) {
+                      return (
+                        <div
+                          className="mt-3 px-3 py-2"
+                          style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "center", gap: "10px" }}
+                        >
+                          <img src={robotSquirrelImg} alt="robot squirrel" style={{ width: "28px", height: "28px", objectFit: "cover", flexShrink: 0, borderRadius: "2px" }} />
+                          <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#666", fontSize: "0.75rem", lineHeight: 1.4 }}>
+                            {fc.prediction}
+                            <span style={{ color: "#e8ff00", marginLeft: "8px", fontFamily: "'VT323', monospace", fontSize: "1rem" }}>{fc.score}</span>
+                            <span style={{ color: fc.confidence >= 80 ? "#39ff14" : fc.confidence >= 65 ? "#e8ff00" : "#ff6b35", marginLeft: "8px", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.7rem" }}>{fc.confidence}%</span>
+                          </span>
+                        </div>
+                      );
+                    }
+
+                    // Determine actual result
+                    const actualResult = fixture.winner === fixture.home ? "HOME" : fixture.winner === fixture.away ? "AWAY" : "DRAW";
+                    const gotResultRight = fc.result === actualResult;
+                    const gotScoreRight = fc.score === fixture.score;
+
+                    const verdict = (() => {
+                      if (gotScoreRight) return { text: `Nailed it. ${fixture.score}. Don't ever doubt me, lads.`, color: "#39ff14", label: "✓ CORRECT" };
+                      if (gotResultRight) return { text: `Got the winner right at least. ${fc.score} was wishful thinking though, boi.`, color: "#e8ff00", label: "~ CLOSE" };
+                      // Wrong result — generate a quip based on what actually happened
+                      const homeGoals = parseInt(fixture.score?.split(" - ")[0] ?? "0");
+                      const awayGoals = parseInt(fixture.score?.split(" - ")[1] ?? "0");
+                      if (actualResult === "DRAW") return { text: `Sorry about that. Didn't have ${fixture.home} and ${fixture.away} down as a pair of absolute dinlows who'd cancel each other out.`, color: "#ff6b35", label: "✗ WRONG" };
+                      if (actualResult === "AWAY") return { text: `Sorry about that. Didn't expect ${fixture.away} to turn up like that. ${fixture.home} are proper plonkers.`, color: "#ff6b35", label: "✗ WRONG" };
+                      if (homeGoals > 3) return { text: `Sorry about that. Didn't realise ${fixture.away} would be that much of a spanner.`, color: "#ff6b35", label: "✗ WRONG" };
+                      return { text: `Sorry about that. Didn't see ${fixture.away} rolling over like that. Absolute doorknobs.`, color: "#ff6b35", label: "✗ WRONG" };
+                    })();
+
                     return (
                       <div
                         className="mt-3 px-3 py-2"
-                        style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "center", gap: "10px" }}
+                        style={{ borderTop: "1px dashed #222", display: "flex", alignItems: "flex-start", gap: "10px" }}
                       >
-                        <img src={robotSquirrelImg} alt="robot squirrel" style={{ width: "28px", height: "28px", objectFit: "cover", flexShrink: 0, borderRadius: "2px" }} />
-                        <span style={{ fontFamily: "'Share Tech Mono', monospace", color: "#666", fontSize: "0.75rem", lineHeight: 1.4 }}>
-                          {fc.prediction}
-                          <span style={{ color: "#e8ff00", marginLeft: "8px", fontFamily: "'VT323', monospace", fontSize: "1rem" }}>{fc.score}</span>
-                          <span style={{ color: (fc as any).confidence >= 80 ? "#39ff14" : (fc as any).confidence >= 65 ? "#e8ff00" : "#ff6b35", marginLeft: "8px", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.7rem" }}>{(fc as any).confidence}%</span>
-                        </span>
+                        <img src={robotSquirrelImg} alt="robot squirrel" style={{ width: "28px", height: "28px", objectFit: "cover", flexShrink: 0, borderRadius: "2px", marginTop: "2px" }} />
+                        <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.75rem", lineHeight: 1.5 }}>
+                          <span style={{ color: verdict.color, fontSize: "0.65rem", letterSpacing: "0.08em", marginRight: "8px" }}>{verdict.label}</span>
+                          <span style={{ color: "#444", fontSize: "0.65rem" }}>predicted {fc.score}</span>
+                          <br />
+                          <span style={{ color: "#666" }}>{verdict.text}</span>
+                        </div>
                       </div>
                     );
                   })()}
