@@ -830,7 +830,7 @@ export function TodayTab() {
                     const verdict = (() => {
                       if (gotScoreRight) {
                         const text = pick([
-                          `Nailed it. ${fixture.score}. Don't ever doubt me, lads.`,
+                          `Nailed it. ${fixture.score}. Don't ever doubt me.`,
                           `Get in. Called it exactly. I'll have the buffalo wings, cheers.`,
                           `${fixture.score}. Told you. I don't just make this stuff up, boi.`,
                           `Spot on. You're welcome. Someone write that down.`,
@@ -855,10 +855,10 @@ export function TodayTab() {
                       if (actualResult === "DRAW") {
                         const text = pick([
                           `${fixture.home} and ${fixture.away} both bottled it. Absolute dinlows the pair of them.`,
-                          `A draw. Neither set of lads wanted to win apparently.`,
+                          `A draw. Neither side wanted to win apparently.`,
                           `Didn't have that down as a draw. Both teams played like cold chicken nuggets look.`,
                           `They cancelled each other out. I'm as surprised as you are.`,
-                          `Neither side could be bothered. Disappointing from both sets of lads.`,
+                          `Neither side could be bothered. Disappointing from both of them.`,
                         ]);
                         return { text, color: "#ff6b35", label: "✗ WRONG" };
                       }
@@ -867,7 +867,7 @@ export function TodayTab() {
                           `${fixture.home} were proper plonkers. Didn't see ${fixture.away} doing that.`,
                           `${fixture.away} turned up. ${fixture.home} very much did not.`,
                           `My bad. ${fixture.home} played like they'd had one too many at the Hooters bar.`,
-                          `${fixture.away} had other ideas. Fair play to the lads.`,
+                          `${fixture.away} had other ideas. Fair play to them.`,
                           `${fixture.home} were an absolute spanner in their own box all game.`,
                           `Didn't see that coming. ${fixture.away} were quality, ${fixture.home} were melon-level bad.`,
                         ]);
@@ -875,9 +875,9 @@ export function TodayTab() {
                       }
                       // Predicted away or draw, home won
                       const text = pick([
-                        `${fixture.home} proved me wrong. Fair play to the lads.`,
+                        `${fixture.home} proved me wrong. Fair play to them.`,
                         `${fixture.away} were the doorknobs here, not ${fixture.home}. Got that the wrong way round.`,
-                        `${homeGoals > 3 ? `${fixture.home} absolutely battered them. Didn't see that coming, boi.` : `${fixture.home} dug it out. I underestimated them.`}`,
+                        `${homeGoals > 3 ? `${fixture.home} absolutely battered them. Didn't see that coming.` : `${fixture.home} dug it out. I underestimated them.`}`,
                         `My bad. ${fixture.away} were utter turnips and I wasn't ready for it.`,
                         `${fixture.home} were brilliant. ${fixture.away} were a disgrace. Wrong call from me.`,
                       ]);
