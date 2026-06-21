@@ -4,6 +4,7 @@ import { useTournamentEvents } from "../hooks/useTournamentEvents";
 import squirrelImg from "../../imports/squirrel.png";
 import robotSquirrelImg from "../../imports/robot-squirrel.png";
 import FORECASTS from "../data/forecasts.json";
+import ORIGINAL_FORECASTS from "../data/original-forecasts.json";
 
 const FLAGS: Record<string, string> = {
   Morocco: "🇲🇦", Turkey: "🇹🇷", Austria: "🇦🇹", "Cape Verde Islands": "🇨🇻", "Cape Verde": "🇨🇻",
@@ -814,17 +815,19 @@ export function TodayTab() {
                       );
                     }
 
+                    // Use original locked predictions for verdict, not the regenerated ones
+                    const origKey = key as keyof typeof ORIGINAL_FORECASTS;
+                    const orig = (ORIGINAL_FORECASTS[origKey] ?? fc) as any;
+
                     // Determine actual result
                     const actualResult = fixture.winner === fixture.home ? "HOME" : fixture.winner === fixture.away ? "AWAY" : "DRAW";
-                    const gotResultRight = fc.result === actualResult;
-                    const gotScoreRight = fc.score === fixture.score;
+                    const gotResultRight = orig.result === actualResult;
+                    const gotScoreRight = orig.score === fixture.score;
 
                     const verdict = (() => {
                       if (gotScoreRight) return { text: `Nailed it. ${fixture.score}. Don't ever doubt me, lads.`, color: "#39ff14", label: "✓ CORRECT" };
-                      if (gotResultRight) return { text: `Got the winner right at least. ${fc.score} was wishful thinking though, boi.`, color: "#e8ff00", label: "~ CLOSE" };
-                      // Wrong result — generate a quip based on what actually happened
+                      if (gotResultRight) return { text: `Got the winner right at least. ${orig.score} was wishful thinking though, boi.`, color: "#e8ff00", label: "~ CLOSE" };
                       const homeGoals = parseInt(fixture.score?.split(" - ")[0] ?? "0");
-                      const awayGoals = parseInt(fixture.score?.split(" - ")[1] ?? "0");
                       if (actualResult === "DRAW") return { text: `Sorry about that. Didn't have ${fixture.home} and ${fixture.away} down as a pair of absolute dinlows who'd cancel each other out.`, color: "#ff6b35", label: "✗ WRONG" };
                       if (actualResult === "AWAY") return { text: `Sorry about that. Didn't expect ${fixture.away} to turn up like that. ${fixture.home} are proper plonkers.`, color: "#ff6b35", label: "✗ WRONG" };
                       if (homeGoals > 3) return { text: `Sorry about that. Didn't realise ${fixture.away} would be that much of a spanner.`, color: "#ff6b35", label: "✗ WRONG" };
@@ -839,7 +842,7 @@ export function TodayTab() {
                         <img src={robotSquirrelImg} alt="robot squirrel" style={{ width: "28px", height: "28px", objectFit: "cover", flexShrink: 0, borderRadius: "2px", marginTop: "2px" }} />
                         <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.75rem", lineHeight: 1.5 }}>
                           <span style={{ color: verdict.color, fontSize: "0.65rem", letterSpacing: "0.08em", marginRight: "8px" }}>{verdict.label}</span>
-                          <span style={{ color: "#444", fontSize: "0.65rem" }}>predicted {fc.score}</span>
+                          <span style={{ color: "#444", fontSize: "0.65rem" }}>predicted {orig.score}</span>
                           <br />
                           <span style={{ color: "#666" }}>{verdict.text}</span>
                         </div>
