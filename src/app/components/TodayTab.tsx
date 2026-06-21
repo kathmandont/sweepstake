@@ -824,14 +824,64 @@ export function TodayTab() {
                     const gotResultRight = orig.result === actualResult;
                     const gotScoreRight = orig.score === fixture.score;
 
+                    // Pick from a pool deterministically so each match gets a unique quip
+                    const pick = (arr: string[]) => arr[fixtureHash(fixture.home, fixture.away) % arr.length];
+
                     const verdict = (() => {
-                      if (gotScoreRight) return { text: `Nailed it. ${fixture.score}. Don't ever doubt me, lads.`, color: "#39ff14", label: "✓ CORRECT" };
-                      if (gotResultRight) return { text: `Got the winner right at least. ${orig.score} was wishful thinking though, boi.`, color: "#e8ff00", label: "~ CLOSE" };
+                      if (gotScoreRight) {
+                        const text = pick([
+                          `Nailed it. ${fixture.score}. Don't ever doubt me, lads.`,
+                          `Get in. Called it exactly. I'll have the buffalo wings, cheers.`,
+                          `${fixture.score}. Told you. I don't just make this stuff up, boi.`,
+                          `Spot on. You're welcome. Someone write that down.`,
+                          `${fixture.score}. Bang on the money. I'm wasted doing this for free.`,
+                        ]);
+                        return { text, color: "#39ff14", label: "✓ CORRECT" };
+                      }
+                      if (gotResultRight) {
+                        const text = pick([
+                          `Got the right winner, wrong score. I'll take it.`,
+                          `Winner right, scoreline was pure guesswork if I'm honest.`,
+                          `Direction right, numbers wrong. Close enough for a robot squirrel.`,
+                          `Predicted ${orig.score}, got ${fixture.score}. Near enough, boi.`,
+                          `Right team, wrong margin. My confidence was clearly doing overtime.`,
+                          `Called the winner at least. The actual score was a bit of a spanner situation.`,
+                        ]);
+                        return { text, color: "#e8ff00", label: "~ CLOSE" };
+                      }
+                      // Wrong result
+                      const awayGoals = parseInt(fixture.score?.split(" - ")[1] ?? "0");
                       const homeGoals = parseInt(fixture.score?.split(" - ")[0] ?? "0");
-                      if (actualResult === "DRAW") return { text: `Sorry about that. Didn't have ${fixture.home} and ${fixture.away} down as a pair of absolute dinlows who'd cancel each other out.`, color: "#ff6b35", label: "✗ WRONG" };
-                      if (actualResult === "AWAY") return { text: `Sorry about that. Didn't expect ${fixture.away} to turn up like that. ${fixture.home} are proper plonkers.`, color: "#ff6b35", label: "✗ WRONG" };
-                      if (homeGoals > 3) return { text: `Sorry about that. Didn't realise ${fixture.away} would be that much of a spanner.`, color: "#ff6b35", label: "✗ WRONG" };
-                      return { text: `Sorry about that. Didn't see ${fixture.away} rolling over like that. Absolute doorknobs.`, color: "#ff6b35", label: "✗ WRONG" };
+                      if (actualResult === "DRAW") {
+                        const text = pick([
+                          `${fixture.home} and ${fixture.away} both bottled it. Absolute dinlows the pair of them.`,
+                          `A draw. Neither set of lads wanted to win apparently.`,
+                          `Didn't have that down as a draw. Both teams played like cold chicken nuggets look.`,
+                          `They cancelled each other out. I'm as surprised as you are.`,
+                          `Neither side could be bothered. Disappointing from both sets of lads.`,
+                        ]);
+                        return { text, color: "#ff6b35", label: "✗ WRONG" };
+                      }
+                      if (actualResult === "AWAY") {
+                        const text = pick([
+                          `${fixture.home} were proper plonkers. Didn't see ${fixture.away} doing that.`,
+                          `${fixture.away} turned up. ${fixture.home} very much did not.`,
+                          `My bad. ${fixture.home} played like they'd had one too many at the Hooters bar.`,
+                          `${fixture.away} had other ideas. Fair play to the lads.`,
+                          `${fixture.home} were an absolute spanner in their own box all game.`,
+                          `Didn't see that coming. ${fixture.away} were quality, ${fixture.home} were melon-level bad.`,
+                        ]);
+                        return { text, color: "#ff6b35", label: "✗ WRONG" };
+                      }
+                      // Predicted away or draw, home won
+                      const text = pick([
+                        `${fixture.home} proved me wrong. Fair play to the lads.`,
+                        `${fixture.away} were the doorknobs here, not ${fixture.home}. Got that the wrong way round.`,
+                        `${homeGoals > 3 ? `${fixture.home} absolutely battered them. Didn't see that coming, boi.` : `${fixture.home} dug it out. I underestimated them.`}`,
+                        `My bad. ${fixture.away} were utter turnips and I wasn't ready for it.`,
+                        `${fixture.home} were brilliant. ${fixture.away} were a disgrace. Wrong call from me.`,
+                      ]);
+                      return { text, color: "#ff6b35", label: "✗ WRONG" };
                     })();
 
                     return (
