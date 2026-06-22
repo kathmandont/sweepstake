@@ -26,7 +26,7 @@ export type PrizeDetection = {
   offsideTotals: Record<string, number>;
 };
 
-const CACHE_PREFIX = "wc2026_espn_match_v5_";
+const CACHE_PREFIX = "wc2026_espn_match_v6_";
 const TODAY = new Date().toISOString().split("T")[0];
 const PAST_MATCH_TTL = Infinity;
 const TODAY_MATCH_TTL = 15 * 60 * 1000;
