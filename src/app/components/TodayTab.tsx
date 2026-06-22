@@ -335,8 +335,8 @@ function GoalList({ goals, align }: { goals: Goal[]; align: "left" | "right" }) 
     <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: align === "right" ? "flex-end" : "flex-start" }}>
       {grouped.map((g, i) => {
         const mins = g.minutes.map(m => `${m}'`).join(", ");
-        const icon = g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : "⚽";
-        const color = g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : "#777";
+        const icon = g.type === "OWN_GOAL" ? "⚽ OG" : g.type === "PENALTY" ? "⚽ pen." : g.type === "MISSED_PENALTY" ? "✗ pen." : "⚽";
+        const color = g.type === "OWN_GOAL" ? "#ff4444" : g.type === "PENALTY" ? "#e8ff00" : g.type === "MISSED_PENALTY" ? "#ff6b35" : "#777";
         return (
           <span key={i} style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.72rem", color, textAlign: align }}>
             {align === "left"
@@ -354,6 +354,7 @@ function MatchEventSummary({ goals, bookings, isFinished, home, away }: { goals:
   const hasEvents = goals.length > 0 || bookings.length > 0;
   if (!isFinished && !hasEvents) return null;
   // Own goals are stored under the scorer's team but should display under the benefiting team
+  // Missed penalties display under the team that missed (not the benefiting side)
   const homeGoals = goals.filter(g => g.type === "OWN_GOAL" ? g.team === away : g.team === home);
   const awayGoals = goals.filter(g => g.type === "OWN_GOAL" ? g.team === home : g.team === away);
   return (

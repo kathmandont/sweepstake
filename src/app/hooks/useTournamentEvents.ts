@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getOwner, PLAYER_TEAMS, normaliseTeam } from "../lib/sweepstake";
 
-export type Goal = { minute: number; type: "REGULAR" | "OWN_GOAL" | "PENALTY"; scorer: string; team: string; matchLabel: string; date: string };
+export type Goal = { minute: number; type: "REGULAR" | "OWN_GOAL" | "PENALTY" | "MISSED_PENALTY"; scorer: string; team: string; matchLabel: string; date: string };
 export type Booking = { minute: number; type: "YELLOW_CARD" | "RED_CARD" | "YELLOW_RED_CARD"; player: string; team: string; matchLabel: string; date: string };
 
 export type MatchSummary = {
@@ -25,7 +25,7 @@ export type PrizeDetection = {
   offsideTotals: Record<string, number>;
 };
 
-const CACHE_PREFIX = "wc2026_espn_match_v3_";
+const CACHE_PREFIX = "wc2026_espn_match_v4_";
 const TODAY = new Date().toISOString().split("T")[0];
 const PAST_MATCH_TTL = Infinity;
 const TODAY_MATCH_TTL = 15 * 60 * 1000;
@@ -87,6 +87,8 @@ async function fetchMatchDetail(id: string, date: string, homeTeam: string, away
         goals.push({ minute, type: "OWN_GOAL", scorer: playerName, team: ownGoalTeam, matchLabel, date });
       } else if (eventType === "penalty---scored") {
         goals.push({ minute, type: "PENALTY", scorer: playerName, team: teamName, matchLabel, date });
+      } else if (eventType === "penalty---missed") {
+        goals.push({ minute, type: "MISSED_PENALTY", scorer: playerName, team: teamName, matchLabel, date });
       } else if (eventType.startsWith("goal")) {
         goals.push({ minute, type: "REGULAR", scorer: playerName, team: teamName, matchLabel, date });
       } else if (eventType === "yellow-card") {
