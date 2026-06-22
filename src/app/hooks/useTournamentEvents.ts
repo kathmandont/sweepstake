@@ -20,12 +20,13 @@ export type MatchSummary = {
 export type PrizeDetection = {
   firstRedCard: { player: string; team: string; opponent: string; minute: number; matchLabel: string } | null;
   firstOwnGoal: { player: string; team: string; scorer: string; minute: number; matchLabel: string } | null;
+  firstMissedPenalty: { player: string; team: string; scorer: string; minute: number; matchLabel: string } | null;
   highestScoringGame: { matchLabel: string; total: number; owners: string[] } | null;
   yellowCardTotals: Record<string, number>;
   offsideTotals: Record<string, number>;
 };
 
-const CACHE_PREFIX = "wc2026_espn_match_v4_";
+const CACHE_PREFIX = "wc2026_espn_match_v5_";
 const TODAY = new Date().toISOString().split("T")[0];
 const PAST_MATCH_TTL = Infinity;
 const TODAY_MATCH_TTL = 15 * 60 * 1000;
@@ -130,6 +131,7 @@ export function useTournamentEvents() {
   const [prizes, setPrizes] = useState<PrizeDetection>({
     firstRedCard: null,
     firstOwnGoal: null,
+    firstMissedPenalty: null,
     highestScoringGame: null,
     yellowCardTotals: {},
     offsideTotals: {},
@@ -149,7 +151,7 @@ export function useTournamentEvents() {
         const data = await res.json();
 
         const finishedEvents = (data.events ?? []).filter(
-          (e: any) => e.status?.type?.name === "STATUS_FULL_TIME"
+          (e: any) => ["STATUS_FULL_TIME", "STATUS_IN_PROGRESS", "STATUS_HALF_TIME"].includes(e.status?.type?.name)
         );
 
         const summaries: MatchSummary[] = [];
@@ -182,6 +184,9 @@ export function useTournamentEvents() {
 
         const ownGoals = allGoals.filter(g => g.type === "OWN_GOAL");
         const firstOG = ownGoals[0] ?? null;
+
+        const missedPens = allGoals.filter(g => g.type === "MISSED_PENALTY");
+        const firstMissed = missedPens[0] ?? null;
 
         let highestGame: PrizeDetection["highestScoringGame"] = null;
         for (const s of summaries) {
@@ -223,6 +228,13 @@ export function useTournamentEvents() {
             scorer: firstOG.scorer,
             minute: firstOG.minute,
             matchLabel: firstOG.matchLabel,
+          } : null,
+          firstMissedPenalty: firstMissed ? {
+            player: getOwner(firstMissed.team) ?? "Unknown",
+            team: firstMissed.team,
+            scorer: firstMissed.scorer,
+            minute: firstMissed.minute,
+            matchLabel: firstMissed.matchLabel,
           } : null,
           highestScoringGame: highestGame,
           yellowCardTotals: yellowTotals,

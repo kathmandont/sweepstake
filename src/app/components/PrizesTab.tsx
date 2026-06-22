@@ -122,6 +122,9 @@ export function PrizesTab() {
     "FIRST OWN GOAL": prizes.firstOwnGoal
       ? { player: prizes.firstOwnGoal.player, note: `${prizes.firstOwnGoal.scorer} · ${prizes.firstOwnGoal.minute}' · ${prizes.firstOwnGoal.matchLabel}` }
       : null,
+    "FIRST PENALTY MISS": prizes.firstMissedPenalty
+      ? { player: prizes.firstMissedPenalty.player, note: `${prizes.firstMissedPenalty.scorer} · ${prizes.firstMissedPenalty.minute}' · ${prizes.firstMissedPenalty.matchLabel}` }
+      : null,
     "HIGHEST SCORING GAME": prizes.highestScoringGame
       ? { player: prizes.highestScoringGame.owners.join(" + ") || "TBC", note: `${prizes.highestScoringGame.matchLabel} · ${prizes.highestScoringGame.total} goals` }
       : null,
