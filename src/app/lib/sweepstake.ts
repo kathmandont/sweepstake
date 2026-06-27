@@ -42,6 +42,18 @@ export function normaliseTeam(name: string): string {
 
 // Add teams here as they get knocked out
 export const ELIMINATED_TEAMS = new Set<string>([
+  "Czech Republic",   // Group A
+  "Korea Republic",   // Group A
+  "Qatar",            // Group B
+  "Haiti",            // Group C
+  "Scotland",         // Group C
+  "Turkey",           // Group D
+  "Curaçao",          // Group E
+  "Tunisia",          // Group F
+  "New Zealand",      // Group G
+  "Uruguay",          // Group H
+  "Saudi Arabia",     // Group H
+  "Iraq",             // Group I
 ]);
 
 export function isEliminated(team: string): boolean {
