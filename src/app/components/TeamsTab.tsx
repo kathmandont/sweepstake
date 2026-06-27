@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { getCountryStats } from "../hooks/useCountryStats";
+import { isEliminated } from "../lib/sweepstake";
 import squirrelImg from "../../imports/squirrel.png";
 import flashImg from "../../imports/1.jpg";
 import chonkieFlashImg from "../../imports/5.jpg";
@@ -283,6 +284,7 @@ export function TeamsTab() {
               {player.teams.map((team) => {
                 const stat = stats[team];
                 const gdp = stat?.gdp_growth;
+                const eliminated = isEliminated(team);
                 const gdpColor = gdp == null ? "#444" : gdp >= 0 ? "#39ff14" : "#ff4444";
                 return (
                   <div
@@ -291,19 +293,23 @@ export function TeamsTab() {
                     style={{
                       fontFamily: "'Share Tech Mono', monospace",
                       fontSize: "0.78rem",
-                      color: "#cccccc",
-                      borderLeft: `2px solid ${player.color}44`,
+                      color: eliminated ? "#444" : "#cccccc",
+                      borderLeft: `2px solid ${eliminated ? "#333" : `${player.color}44`}`,
+                      opacity: eliminated ? 0.45 : 1,
                     }}
                   >
-                    <span>{FLAGS[team] || "🏳"}</span>
-                    <span className="truncate flex-1">{team}</span>
+                    <span style={{ filter: eliminated ? "grayscale(1)" : "none" }}>{FLAGS[team] || "🏳"}</span>
+                    <span className="truncate flex-1" style={{ textDecoration: eliminated ? "line-through" : "none" }}>{team}</span>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      {gdp != null && (
+                      {!eliminated && gdp != null && (
                         <div style={{ color: gdpColor, fontSize: "0.65rem", whiteSpace: "nowrap" }}>
                           {gdp > 0 ? "+" : ""}{gdp.toFixed(1)}%
                         </div>
                       )}
-                      {stat?.funFact && (
+                      {eliminated && (
+                        <div style={{ color: "#444", fontSize: "0.6rem", whiteSpace: "nowrap" }}>out</div>
+                      )}
+                      {!eliminated && stat?.funFact && (
                         <div style={{ color: "#444", fontSize: "0.6rem", whiteSpace: "nowrap", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {stat.funFact}
                         </div>
@@ -381,19 +387,22 @@ export function TeamsTab() {
         </div>
         <div className="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {PLAYERS.flatMap((p) =>
-            p.teams.map((team) => (
-              <div
-                key={`${p.name}-${team}`}
-                className="flex items-center gap-2 px-2 py-1"
-                style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.8rem" }}
-              >
-                <span>{FLAGS[team] || "🏳"}</span>
-                <span style={{ color: "#aaaaaa" }} className="truncate">{team}</span>
-                <span style={{ color: p.color, marginLeft: "auto", whiteSpace: "nowrap", fontSize: "0.7rem" }}>
-                  {p.name}
-                </span>
-              </div>
-            ))
+            p.teams.map((team) => {
+              const eliminated = isEliminated(team);
+              return (
+                <div
+                  key={`${p.name}-${team}`}
+                  className="flex items-center gap-2 px-2 py-1"
+                  style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.8rem", opacity: eliminated ? 0.35 : 1 }}
+                >
+                  <span style={{ filter: eliminated ? "grayscale(1)" : "none" }}>{FLAGS[team] || "🏳"}</span>
+                  <span style={{ color: eliminated ? "#444" : "#aaaaaa", textDecoration: eliminated ? "line-through" : "none" }} className="truncate">{team}</span>
+                  <span style={{ color: eliminated ? "#333" : p.color, marginLeft: "auto", whiteSpace: "nowrap", fontSize: "0.7rem" }}>
+                    {p.name}
+                  </span>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

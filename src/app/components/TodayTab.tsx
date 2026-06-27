@@ -144,23 +144,23 @@ const FIXTURES: { date: string; home: string; away: string; time: string; timeAE
   { date: "2026-06-28", home: "Runner-up A", away: "Runner-up B", time: "8:00pm", timeAEST: "5:00am (+1)", stage: "Round of 32", tv: "TBC" },
   // June 29
   { date: "2026-06-29", home: "Winner C", away: "Runner-up F", time: "6:00pm", timeAEST: "3:00am (+1)", stage: "Round of 32", tv: "TBC" },
-  { date: "2026-06-29", home: "Winner E", away: "Best 3rd", time: "9:30pm", timeAEST: "6:30am (+1)", stage: "Round of 32", tv: "TBC" },
+  { date: "2026-06-29", home: "Germany", away: "Best 3rd", time: "9:30pm", timeAEST: "6:30am (+1)", stage: "Round of 32", tv: "TBC" },
   // June 30
   { date: "2026-06-30", home: "Winner F", away: "Runner-up C", time: "2:00am", timeAEST: "11:00am", stage: "Round of 32", tv: "TBC" },
   { date: "2026-06-30", home: "Runner-up E", away: "Runner-up I", time: "6:00pm", timeAEST: "3:00am (+1)", stage: "Round of 32", tv: "TBC" },
   { date: "2026-06-30", home: "Winner I", away: "Best 3rd", time: "10:00pm", timeAEST: "7:00am (+1)", stage: "Round of 32", tv: "TBC" },
   // July 1
-  { date: "2026-07-01", home: "Winner A", away: "Best 3rd", time: "2:00am", timeAEST: "11:00am", stage: "Round of 32", tv: "TBC" },
+  { date: "2026-07-01", home: "Mexico", away: "Best 3rd", time: "2:00am", timeAEST: "11:00am", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-01", home: "Winner L", away: "Best 3rd", time: "5:00pm", timeAEST: "2:00am (+1)", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-01", home: "Winner G", away: "Best 3rd", time: "9:00pm", timeAEST: "6:00am (+1)", stage: "Round of 32", tv: "TBC" },
   // July 2
-  { date: "2026-07-02", home: "Winner D", away: "Best 3rd", time: "1:00am", timeAEST: "10:00am", stage: "Round of 32", tv: "TBC" },
+  { date: "2026-07-02", home: "USA", away: "Best 3rd", time: "1:00am", timeAEST: "10:00am", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-02", home: "Winner H", away: "Runner-up J", time: "8:00pm", timeAEST: "5:00am (+1)", stage: "Round of 32", tv: "TBC" },
   // July 3
   { date: "2026-07-03", home: "Runner-up K", away: "Runner-up L", time: "12:00am", timeAEST: "9:00am", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-03", home: "Winner B", away: "Best 3rd", time: "4:00am", timeAEST: "1:00pm", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-03", home: "Runner-up D", away: "Runner-up G", time: "7:00pm", timeAEST: "4:00am (+1)", stage: "Round of 32", tv: "TBC" },
-  { date: "2026-07-03", home: "Winner J", away: "Runner-up H", time: "11:00pm", timeAEST: "8:00am (+1)", stage: "Round of 32", tv: "TBC" },
+  { date: "2026-07-03", home: "Argentina", away: "Runner-up H", time: "11:00pm", timeAEST: "8:00am (+1)", stage: "Round of 32", tv: "TBC" },
   // July 4
   { date: "2026-07-04", home: "Winner K", away: "Best 3rd", time: "2:30am", timeAEST: "11:30am", stage: "Round of 32", tv: "TBC" },
   { date: "2026-07-04", home: "TBD", away: "TBD", time: "6:00pm", timeAEST: "3:00am (+1)", stage: "Round of 16", tv: "TBC" },

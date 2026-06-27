@@ -40,6 +40,14 @@ export function normaliseTeam(name: string): string {
   return TEAM_ALIASES[name] ?? name;
 }
 
+// Add teams here as they get knocked out
+export const ELIMINATED_TEAMS = new Set<string>([
+]);
+
+export function isEliminated(team: string): boolean {
+  return ELIMINATED_TEAMS.has(normaliseTeam(team));
+}
+
 export function getOwner(team: string): string | null {
   const resolved = normaliseTeam(team);
   for (const [player, teams] of Object.entries(PLAYER_TEAMS)) {
