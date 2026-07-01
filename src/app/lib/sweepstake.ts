@@ -50,10 +50,14 @@ export const ELIMINATED_TEAMS = new Set<string>([
   "Turkey",           // Group D
   "Curaçao",          // Group E
   "Tunisia",          // Group F
+  "Iran",             // Group G
   "New Zealand",      // Group G
   "Uruguay",          // Group H
   "Saudi Arabia",     // Group H
   "Iraq",             // Group I
+  "Jordan",           // Group J
+  "Uzbekistan",       // Group K
+  "Panama",           // Group L
   // Round of 32
   "South Africa",     // lost to Canada
   "Japan",            // lost to Brazil
