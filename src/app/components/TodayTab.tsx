@@ -143,14 +143,14 @@ const FIXTURES: { date: string; home: string; away: string; time: string; timeAE
   { date: "2026-06-28", home: "Jordan", away: "Argentina", time: "3:00am", timeAEST: "12:00pm", stage: "Group J", tv: "BBC" },
   { date: "2026-06-28", home: "Canada", away: "South Africa", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "ITV", score: "1 - 0", winner: "Canada" },
   // June 29
-  { date: "2026-06-29", home: "Brazil", away: "Japan", time: "6:00pm", timeAEST: "3:00am (+1)", stage: "Round of 32", tv: "ITV" },
-  { date: "2026-06-29", home: "Germany", away: "Paraguay", time: "9:30pm", timeAEST: "6:30am (+1)", stage: "Round of 32", tv: "BBC" },
+  { date: "2026-06-29", home: "Brazil", away: "Japan", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "ITV", score: "2 - 1", winner: "Brazil" },
+  { date: "2026-06-29", home: "Germany", away: "Paraguay", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "BBC", score: "1 - 1 (pens)", winner: "Paraguay" },
   // June 30
-  { date: "2026-06-30", home: "Netherlands", away: "Morocco", time: "2:00am", timeAEST: "11:00am", stage: "Round of 32", tv: "ITV" },
-  { date: "2026-06-30", home: "Ivory Coast", away: "Norway", time: "6:00pm", timeAEST: "3:00am (+1)", stage: "Round of 32", tv: "BBC" },
-  { date: "2026-06-30", home: "France", away: "Sweden", time: "10:00pm", timeAEST: "7:00am (+1)", stage: "Round of 32", tv: "ITV" },
+  { date: "2026-06-30", home: "Netherlands", away: "Morocco", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "ITV", score: "1 - 1 (pens)", winner: "Morocco" },
+  { date: "2026-06-30", home: "Ivory Coast", away: "Norway", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "BBC", score: "1 - 2", winner: "Norway" },
+  { date: "2026-06-30", home: "France", away: "Sweden", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "ITV", score: "3 - 0", winner: "France" },
   // July 1
-  { date: "2026-07-01", home: "Mexico", away: "Ecuador", time: "2:00am", timeAEST: "11:00am", stage: "Round of 32", tv: "ITV" },
+  { date: "2026-07-01", home: "Mexico", away: "Ecuador", time: "FT", timeAEST: "FT", stage: "Round of 32", tv: "ITV", score: "2 - 0", winner: "Mexico" },
   { date: "2026-07-01", home: "England", away: "DR Congo", time: "5:00pm", timeAEST: "2:00am (+1)", stage: "Round of 32", tv: "BBC" },
   { date: "2026-07-01", home: "Belgium", away: "Senegal", time: "9:00pm", timeAEST: "6:00am (+1)", stage: "Round of 32", tv: "ITV" },
   // July 2

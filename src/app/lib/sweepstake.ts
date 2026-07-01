@@ -54,6 +54,14 @@ export const ELIMINATED_TEAMS = new Set<string>([
   "Uruguay",          // Group H
   "Saudi Arabia",     // Group H
   "Iraq",             // Group I
+  // Round of 32
+  "South Africa",     // lost to Canada
+  "Japan",            // lost to Brazil
+  "Germany",          // lost to Paraguay (pens)
+  "Netherlands",      // lost to Morocco (pens)
+  "Côte d'Ivoire",    // lost to Norway
+  "Sweden",           // lost to France
+  "Ecuador",          // lost to Mexico
 ]);
 
 export function isEliminated(team: string): boolean {
