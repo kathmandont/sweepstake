@@ -55,6 +55,9 @@ const PRIZES = [
     reward: "A hash brown. Not as part of a breakfast. Just a hash brown.",
     flavour: "Handed over in silence.",
     tag: "EARLY EXIT",
+    winner: "MEDLEY",
+    winnerColor: "#e8ff00",
+    winnerNote: "Haiti — eliminated Group C",
   },
   {
     title: "MOST YELLOW CARDS",
@@ -79,6 +82,9 @@ const PRIZES = [
     reward: "A Filet-O-Fish and a tap water.",
     flavour: "We love you but we need you to reflect.",
     tag: "RIP",
+    winner: "POOCH",
+    winnerColor: "#ff00ff",
+    winnerNote: "Iraq — last place, -11 goal difference",
   },
   {
     title: "DARK HORSE BONUS",
